@@ -8,4 +8,6 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./docker/db-store:/var/lib/postgresql/data
+      - db-store:/var/lib/postgresql/data
+volumes:
+  db-store:

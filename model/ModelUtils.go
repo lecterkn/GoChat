@@ -4,6 +4,6 @@ type ModelUtils interface {
 	ToDbModel()
 }
 
-func (modelUtils ModelUtils) ToDbModel(userModel UserModel) string {
+func ToDbModel(userModel UserModel) string {
 	return ""
 }
