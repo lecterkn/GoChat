@@ -14,8 +14,8 @@ import (
 type UserController struct{}
 
 type UserRequest struct {
-	Name string `json:"name"`
-	Url string `json:"url"`
+	Name string `json:"name" binding:"required,min=1,max=20"`
+	Url string `json:"url" binding:"required"`
 }
 
 func (uc UserController) Index(ctx *gin.Context) {
