@@ -1,6 +1,6 @@
 version: '3'
 services:
-  db:
+  postgres:
     image: postgres:14
     container_name: my_postgres
     environment:
@@ -9,5 +9,14 @@ services:
       - "5432:5432"
     volumes:
       - db-store:/var/lib/postgresql/data
+  phppgadmin:
+    image: dockage/phppgadmin
+    environment:
+      - PHPPGADMIN_SERVER_HOST=postgres
+      - PHPPGADMIN_SERVER_PORT=5432
+    ports:
+      - "5433:80"
+    depends_on:
+      - postgres
 volumes:
   db-store:

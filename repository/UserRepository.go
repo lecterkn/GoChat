@@ -22,10 +22,14 @@ func (ur UserRepository) Insert(model *model.UserModel) (*model.UserModel) {
 }
 
 func (ur UserRepository) Index() ([]model.UserModel) {
-	var tables []model.UserTable
-	var users []model.UserModel
+	// モデルとテーブル
+	tables := []model.UserTable{}	
+	users := []model.UserModel{}
+
+	// db接続
 	connector := db.DB()
 	rows, err := connector.Query("SELECT * FROM users")
+
 	if err != nil {
 		fmt.Println(err)
 		return users

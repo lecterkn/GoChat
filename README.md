@@ -12,5 +12,5 @@ go run .
 
 ## マイグレーション
 ```shell
-sql-migrate new <action>
+sql-migrate up
 ```
