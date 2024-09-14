@@ -5,7 +5,6 @@ type ErrorResponse struct {
 	Message string `json:"message"`
 }
 
-
 func ValidationErrorResponse(message string) ErrorResponse {
 	return ErrorResponse{
 		"400",

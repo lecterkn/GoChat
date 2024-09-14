@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"lecter/hello/config"
 	"lecter/hello/db"
 	"lecter/hello/router"
@@ -11,14 +12,22 @@ import (
 
 func main() {
 	// configs.jsonから読み込んだConfig
-	appConfig := *config.LoadConfig()
+	appConfig := config.LoadConfig()
+	if (appConfig != nil) {
+		config.ApplicationConfig = *appConfig
+	}
 
 	// DB接続
-	db.Connect()
+	err := db.Connect()
+	if (err != nil) {
+		fmt.Println("DB Connection ERROR")
+		return
+	}
+	defer db.DB().Close()
 
 	server := gin.Default()
 	router.Routing(server)
 
 	// サーバー起動
-	server.Run(":" + strconv.Itoa(appConfig.Port))
+	server.Run(":" + strconv.Itoa(config.ApplicationConfig.Port))
 }
