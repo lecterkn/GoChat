@@ -5,6 +5,7 @@ import (
 	"lecter/hello/db"
 	"lecter/hello/model"
 
+	"github.com/google/uuid"
 )
 
 type UserRepository struct{}
@@ -14,11 +15,20 @@ func (ur UserRepository) Insert(model *model.UserModel) (*model.UserModel) {
 	connector := db.DB()
 	err := connector.QueryRow("INSERT INTO users (id, name, url) VALUES($1, $2, $3) RETURNING *", table.Id, table.Name, table.Url).Scan(&table.Id, &table.Name, &table.Url)
 	if err != nil {
-		fmt.Println(err.Error())
 		return nil
 	}
 	*model = *table.ToModel()
 	return model
+}
+
+func (ur UserRepository) Select(id uuid.UUID) (*model.UserModel) {
+	var table model.UserTable
+	connector := db.DB()
+	err := connector.QueryRow("SELECT * FROM users WHERE id=$1", id[:]).Scan(&table.Id, &table.Name, &table.Url)
+	if err != nil {
+		return nil
+	}
+	return table.ToModel()
 }
 
 func (ur UserRepository) Index() ([]model.UserModel) {
@@ -40,7 +50,7 @@ func (ur UserRepository) Index() ([]model.UserModel) {
 		var table model.UserTable
 		err := rows.Scan(&table.Id, &table.Name, &table.Url)
 		if err != nil {
-			fmt.Println("failed to convert UserTable")
+			fmt.Println(err.Error())
 			continue
 		}
 		tables = append(tables, table)

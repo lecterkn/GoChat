@@ -18,3 +18,10 @@ func InternalErrorResponse(message string) ErrorResponse {
 		message,
 	}
 }
+
+func NotFoundErrorResponse(message string) ErrorResponse {
+	return ErrorResponse{
+		"404",
+		message,
+	}
+}

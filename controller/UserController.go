@@ -13,11 +13,14 @@ import (
 
 type UserController struct{}
 
-type UserRequest struct {
+type UserCreateRequest struct {
 	Name string `json:"name" binding:"required,min=1,max=20"`
 	Url string `json:"url" binding:"required"`
 }
 
+/*
+ * ユーザー一覧を取得
+ */
 func (uc UserController) Index(ctx *gin.Context) {
 	userRepository := repository.UserRepository{}
 	models := userRepository.Index()
@@ -28,8 +31,30 @@ func (uc UserController) Index(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, models)
 }
 
+/*
+ * 特定のユーザーを取得
+ */
+func (uc UserController) Select(ctx *gin.Context) {
+	user_id := ctx.Param("user_id")
+	id, err := uuid.Parse(user_id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, common.ValidationErrorResponse("invalid id"))
+		return
+	}
+	userRepository := repository.UserRepository{}
+	model := userRepository.Select(id)
+	if model == nil {
+		ctx.JSON(http.StatusForbidden, common.NotFoundErrorResponse("user not found"))
+		return
+	}
+	ctx.JSON(http.StatusOK, model)
+}
+
+/*
+ * ユーザーを作成
+ */
 func (uc UserController) Create(ctx *gin.Context) {
-	var request UserRequest
+	var request UserCreateRequest
 	// バリデーションチェック
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		ctx.JSON(http.StatusBadRequest, common.ValidationErrorResponse("validation error"))
