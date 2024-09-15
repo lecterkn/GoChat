@@ -11,13 +11,18 @@ type AppConfig struct {
 	Version string `json:"version"`
 }
 
+// configファイル
 const FileName string = "configs.json"
+// デフォルトのAppConfig
 var ApplicationConfig = AppConfig{
 	Port: 8080,
 	Name: "lecter",
 	Version: "beta",
 }
 
+/*
+ * configファイルから設定を読み込む
+ */
 func LoadConfig() *AppConfig {
 	file, err := os.ReadFile(FileName)
 	if err != nil {
