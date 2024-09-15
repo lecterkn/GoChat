@@ -10,15 +10,16 @@ import (
 
 type UserRepository struct{}
 
-func (ur UserRepository) Insert(model *model.UserModel) (*model.UserModel) {
+func (ur UserRepository) Insert(model model.UserModel) (*model.UserModel) {
 	table := model.ToTable()
 	connector := db.DB()
 	err := connector.QueryRow("INSERT INTO users (id, name, url) VALUES($1, $2, $3) RETURNING *", table.Id, table.Name, table.Url).Scan(&table.Id, &table.Name, &table.Url)
 	if err != nil {
+		fmt.Println(err.Error())
 		return nil
 	}
-	*model = *table.ToModel()
-	return model
+	model = *table.ToModel()
+	return &model
 }
 
 func (ur UserRepository) Select(id uuid.UUID) (*model.UserModel) {
@@ -26,6 +27,7 @@ func (ur UserRepository) Select(id uuid.UUID) (*model.UserModel) {
 	connector := db.DB()
 	err := connector.QueryRow("SELECT * FROM users WHERE id=$1", id[:]).Scan(&table.Id, &table.Name, &table.Url)
 	if err != nil {
+		fmt.Println(err.Error())
 		return nil
 	}
 	return table.ToModel()
@@ -64,4 +66,16 @@ func (ur UserRepository) Index() ([]model.UserModel) {
 		users = append(users, *model)
 	}
 	return users
+}
+
+func (ur UserRepository) Update(model model.UserModel) (*model.UserModel) {
+	table := model.ToTable()
+	connector := db.DB()
+	err := connector.QueryRow("UPDATE users SET name=$1, url=$2 WHERE id=$3 RETURNING *", table.Name, table.Url, table.Id).Scan(&table.Id, &table.Name, &table.Url)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil
+	}
+	model = *table.ToModel()
+	return &model
 }

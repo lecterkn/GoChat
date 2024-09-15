@@ -18,6 +18,11 @@ type UserCreateRequest struct {
 	Url string `json:"url" binding:"required"`
 }
 
+type UserUpdateRequest struct {
+	Name string `json:"name" binding:"required,min=1,max=20"`
+	Url string `json:"url" binding:"required"`
+}
+
 /*
  * ユーザー一覧を取得
  */
@@ -25,7 +30,7 @@ func (uc UserController) Index(ctx *gin.Context) {
 	userRepository := repository.UserRepository{}
 	models := userRepository.Index()
 	if models == nil {
-		ctx.JSON(http.StatusInternalServerError, common.InternalErrorResponse("failed to get models"))
+		ctx.JSON(common.InternalErrorResponse("failed to get models"))
 		return
 	}
 	ctx.JSON(http.StatusOK, models)
@@ -35,16 +40,15 @@ func (uc UserController) Index(ctx *gin.Context) {
  * 特定のユーザーを取得
  */
 func (uc UserController) Select(ctx *gin.Context) {
-	user_id := ctx.Param("user_id")
-	id, err := uuid.Parse(user_id)
+	userId, err := uuid.Parse(ctx.Param("userId"))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, common.ValidationErrorResponse("invalid id"))
+		ctx.JSON(common.ValidationErrorResponse("invalid id"))
 		return
 	}
 	userRepository := repository.UserRepository{}
-	model := userRepository.Select(id)
+	model := userRepository.Select(userId)
 	if model == nil {
-		ctx.JSON(http.StatusForbidden, common.NotFoundErrorResponse("user not found"))
+		ctx.JSON(common.NotFoundErrorResponse("user not found"))
 		return
 	}
 	ctx.JSON(http.StatusOK, model)
@@ -57,28 +61,62 @@ func (uc UserController) Create(ctx *gin.Context) {
 	var request UserCreateRequest
 	// バリデーションチェック
 	if err := ctx.ShouldBindJSON(&request); err != nil {
-		ctx.JSON(http.StatusBadRequest, common.ValidationErrorResponse("validation error"))
+		ctx.JSON(common.ValidationErrorResponse("validation error"))
 		return
 	}
 
 	id, err := uuid.NewV7()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, common.InternalErrorResponse("uuid error"))
+		ctx.JSON(common.InternalErrorResponse("uuid error"))
 		return
 	}
-	model := model.UserModel{
+	model := &model.UserModel{
 		Id: id,
 		Name: request.Name,
 		Url: request.Url,
 	}
 
 	userRepository := repository.UserRepository{}
-	result := userRepository.Insert(&model)
+	model = userRepository.Insert(*model)
 
-	if result == nil {
-		ctx.JSON(http.StatusInternalServerError, common.InternalErrorResponse("db connection error"))
+	if model == nil {
+		ctx.JSON(common.InternalErrorResponse("db connection error"))
 		fmt.Println("failed to insert UserModel")
 		return
 	}
-	ctx.JSON(http.StatusOK, *result)
+	ctx.JSON(http.StatusOK, *model)
+}
+
+/*
+ * ユーザーの更新
+ */
+func (uc UserController) Update(ctx *gin.Context) {
+	userId, err := uuid.Parse(ctx.Param("userId"))
+	if err != nil {
+		fmt.Println(err.Error())
+		ctx.JSON(common.ValidationErrorResponse("invalid userId"))
+		return
+	}
+
+	var request UserUpdateRequest
+
+	if err := ctx.ShouldBindJSON(&request); err != nil {
+		fmt.Println(err.Error())
+		ctx.JSON(common.ValidationErrorResponse("invalid request"))
+		return
+	}
+
+	userRepository := repository.UserRepository{}
+	model := userRepository.Select(userId)
+
+	if model == nil {
+		ctx.JSON(common.NotFoundErrorResponse("user not found"))
+		return
+	}
+
+	model.Name = request.Name
+	model.Url = request.Url
+
+	model = userRepository.Update(*model)
+	ctx.JSON(http.StatusOK, *model)
 }

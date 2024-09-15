@@ -14,6 +14,7 @@ func Routing(r *gin.Engine)  {
 	// User
 	uc := controller.UserController{}
 	r.GET("/users", uc.Index)
-	r.GET("/users/:user_id", uc.Select)
+	r.GET("/users/:userId", uc.Select)
 	r.POST("/users", uc.Create)
+	r.PATCH("/users/:userId", uc.Update)
 }
