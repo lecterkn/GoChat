@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"lecter/hello/common"
-	"lecter/hello/db"
-	"lecter/hello/router"
+	"lecter/goserver/common"
+	"lecter/goserver/db"
+	"lecter/goserver/router"
 	"strconv"
 
 	"github.com/gin-gonic/gin"

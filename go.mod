@@ -1,4 +1,4 @@
-module lecter/hello
+module lecter/goserver
 
 go 1.23.1
 

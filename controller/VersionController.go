@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"lecter/hello/model"
-	"lecter/hello/common"
+	"lecter/goserver/model"
+	"lecter/goserver/common"
 	"github.com/gin-gonic/gin"
 )
 

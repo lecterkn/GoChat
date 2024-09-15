@@ -2,10 +2,10 @@ package controller
 
 import (
 	"fmt"
-	"lecter/hello/controller/request"
-	"lecter/hello/controller/response"
-	"lecter/hello/model"
-	"lecter/hello/repository"
+	"lecter/goserver/controller/request"
+	"lecter/goserver/controller/response"
+	"lecter/goserver/model"
+	"lecter/goserver/repository"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

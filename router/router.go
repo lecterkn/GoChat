@@ -1,7 +1,7 @@
 package router
 
 import (
-	"lecter/hello/controller"
+	"lecter/goserver/controller"
 
 	"github.com/gin-gonic/gin"
 )

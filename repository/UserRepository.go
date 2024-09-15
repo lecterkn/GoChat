@@ -2,8 +2,8 @@ package repository
 
 import (
 	"fmt"
-	"lecter/hello/db"
-	"lecter/hello/model"
+	"lecter/goserver/db"
+	"lecter/goserver/model"
 
 	"github.com/google/uuid"
 )
