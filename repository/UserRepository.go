@@ -12,7 +12,7 @@ type UserRepository struct{}
 
 func (ur UserRepository) Insert(model model.UserModel) (*model.UserModel) {
 	table := model.ToTable()
-	connector := db.DB()
+	connector := db.Database()
 	err := connector.QueryRow("INSERT INTO users (id, name, url) VALUES($1, $2, $3) RETURNING *", table.Id, table.Name, table.Url).Scan(&table.Id, &table.Name, &table.Url)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -24,7 +24,7 @@ func (ur UserRepository) Insert(model model.UserModel) (*model.UserModel) {
 
 func (ur UserRepository) Select(id uuid.UUID) (*model.UserModel) {
 	var table model.UserTable
-	connector := db.DB()
+	connector := db.Database()
 	err := connector.QueryRow("SELECT * FROM users WHERE id=$1", id[:]).Scan(&table.Id, &table.Name, &table.Url)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -39,7 +39,7 @@ func (ur UserRepository) Index() ([]model.UserModel) {
 	users := []model.UserModel{}
 
 	// db接続
-	connector := db.DB()
+	connector := db.Database()
 	rows, err := connector.Query("SELECT * FROM users")
 
 	if err != nil {
@@ -70,7 +70,7 @@ func (ur UserRepository) Index() ([]model.UserModel) {
 
 func (ur UserRepository) Update(model model.UserModel) (*model.UserModel) {
 	table := model.ToTable()
-	connector := db.DB()
+	connector := db.Database()
 	err := connector.QueryRow("UPDATE users SET name=$1, url=$2 WHERE id=$3 RETURNING *", table.Name, table.Url, table.Id).Scan(&table.Id, &table.Name, &table.Url)
 	if err != nil {
 		fmt.Println(err.Error())
