@@ -10,6 +10,9 @@ import (
 type VersionController struct {
 }
 
+/*
+ * バージョンを取得
+ */
 func (vc VersionController) Index(ctx *gin.Context) {
 	model := model.VersionModel{
 		Name: config.ApplicationConfig.Name,
