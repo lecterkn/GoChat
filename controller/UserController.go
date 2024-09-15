@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"lecter/hello/common"
+	"lecter/hello/controller/request"
 	"lecter/hello/model"
 	"lecter/hello/repository"
 	"net/http"
@@ -12,16 +13,6 @@ import (
 )
 
 type UserController struct{}
-
-type UserCreateRequest struct {
-	Name string `json:"name" binding:"required,min=1,max=20"`
-	Url string `json:"url" binding:"required"`
-}
-
-type UserUpdateRequest struct {
-	Name string `json:"name" binding:"required,min=1,max=20"`
-	Url string `json:"url" binding:"required"`
-}
 
 /*
  * ユーザー一覧を取得
@@ -58,7 +49,7 @@ func (uc UserController) Select(ctx *gin.Context) {
  * ユーザーを作成
  */
 func (uc UserController) Create(ctx *gin.Context) {
-	var request UserCreateRequest
+	var request request.UserCreateRequest
 	// バリデーションチェック
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		ctx.JSON(common.ValidationErrorResponse("validation error"))
@@ -98,7 +89,7 @@ func (uc UserController) Update(ctx *gin.Context) {
 		return
 	}
 
-	var request UserUpdateRequest
+	var request request.UserUpdateRequest
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		fmt.Println(err.Error())
