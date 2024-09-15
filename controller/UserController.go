@@ -2,8 +2,8 @@ package controller
 
 import (
 	"fmt"
-	"lecter/hello/common"
 	"lecter/hello/controller/request"
+	"lecter/hello/controller/response"
 	"lecter/hello/model"
 	"lecter/hello/repository"
 	"net/http"
@@ -21,7 +21,7 @@ func (uc UserController) Index(ctx *gin.Context) {
 	userRepository := repository.UserRepository{}
 	models := userRepository.Index()
 	if models == nil {
-		ctx.JSON(common.InternalErrorResponse("failed to get models"))
+		ctx.JSON(response.InternalErrorResponse("failed to get models"))
 		return
 	}
 	ctx.JSON(http.StatusOK, models)
@@ -33,13 +33,13 @@ func (uc UserController) Index(ctx *gin.Context) {
 func (uc UserController) Select(ctx *gin.Context) {
 	userId, err := uuid.Parse(ctx.Param("userId"))
 	if err != nil {
-		ctx.JSON(common.ValidationErrorResponse("invalid id"))
+		ctx.JSON(response.ValidationErrorResponse("invalid id"))
 		return
 	}
 	userRepository := repository.UserRepository{}
 	model := userRepository.Select(userId)
 	if model == nil {
-		ctx.JSON(common.NotFoundErrorResponse("user not found"))
+		ctx.JSON(response.NotFoundErrorResponse("user not found"))
 		return
 	}
 	ctx.JSON(http.StatusOK, model)
@@ -52,13 +52,13 @@ func (uc UserController) Create(ctx *gin.Context) {
 	var request request.UserCreateRequest
 	// バリデーションチェック
 	if err := ctx.ShouldBindJSON(&request); err != nil {
-		ctx.JSON(common.ValidationErrorResponse("validation error"))
+		ctx.JSON(response.ValidationErrorResponse("validation error"))
 		return
 	}
 
 	id, err := uuid.NewV7()
 	if err != nil {
-		ctx.JSON(common.InternalErrorResponse("uuid error"))
+		ctx.JSON(response.InternalErrorResponse("uuid error"))
 		return
 	}
 	model := &model.UserModel{
@@ -71,7 +71,7 @@ func (uc UserController) Create(ctx *gin.Context) {
 	model = userRepository.Insert(*model)
 
 	if model == nil {
-		ctx.JSON(common.InternalErrorResponse("db connection error"))
+		ctx.JSON(response.InternalErrorResponse("db connection error"))
 		fmt.Println("failed to insert UserModel")
 		return
 	}
@@ -85,7 +85,7 @@ func (uc UserController) Update(ctx *gin.Context) {
 	userId, err := uuid.Parse(ctx.Param("userId"))
 	if err != nil {
 		fmt.Println(err.Error())
-		ctx.JSON(common.ValidationErrorResponse("invalid userId"))
+		ctx.JSON(response.ValidationErrorResponse("invalid userId"))
 		return
 	}
 
@@ -93,7 +93,7 @@ func (uc UserController) Update(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		fmt.Println(err.Error())
-		ctx.JSON(common.ValidationErrorResponse("invalid request"))
+		ctx.JSON(response.ValidationErrorResponse("invalid request"))
 		return
 	}
 
@@ -101,7 +101,7 @@ func (uc UserController) Update(ctx *gin.Context) {
 	model := userRepository.Select(userId)
 
 	if model == nil {
-		ctx.JSON(common.NotFoundErrorResponse("user not found"))
+		ctx.JSON(response.NotFoundErrorResponse("user not found"))
 		return
 	}
 
