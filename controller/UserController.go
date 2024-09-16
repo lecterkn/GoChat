@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"lecter/goserver/controller/request"
 	"lecter/goserver/controller/response"
-	"lecter/goserver/model"
-	"lecter/goserver/repository"
+	"lecter/goserver/service"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,14 +13,15 @@ import (
 
 type UserController struct{}
 
+var userService = service.UserService{}
+
 /*
  * ユーザー一覧を取得
  */
 func (uc UserController) Index(ctx *gin.Context) {
-	userRepository := repository.UserRepository{}
-	models := userRepository.Index()
-	if models == nil {
-		ctx.JSON(response.InternalErrorResponse("failed to get models"))
+	models, error := userService.GetUsers()
+	if error != nil {
+		ctx.JSON(error.ToResponse())
 		return
 	}
 	ctx.JSON(http.StatusOK, models)
@@ -33,13 +33,13 @@ func (uc UserController) Index(ctx *gin.Context) {
 func (uc UserController) Select(ctx *gin.Context) {
 	userId, err := uuid.Parse(ctx.Param("userId"))
 	if err != nil {
-		ctx.JSON(response.ValidationErrorResponse("invalid id"))
+		ctx.JSON(response.ValidationError("invalid userId").ToResponse())
 		return
 	}
-	userRepository := repository.UserRepository{}
-	model := userRepository.Select(userId)
-	if model == nil {
-		ctx.JSON(response.NotFoundErrorResponse("user not found"))
+
+	model, error := userService.GetUser(userId)
+	if error != nil {
+		ctx.JSON(error.ToResponse())
 		return
 	}
 	ctx.JSON(http.StatusOK, model)
@@ -52,27 +52,14 @@ func (uc UserController) Create(ctx *gin.Context) {
 	var request request.UserCreateRequest
 	// バリデーションチェック
 	if err := ctx.ShouldBindJSON(&request); err != nil {
-		ctx.JSON(response.ValidationErrorResponse("validation error"))
+		ctx.JSON(response.ValidationError("invalid request body").ToResponse())
 		return
 	}
 
-	id, err := uuid.NewV7()
-	if err != nil {
-		ctx.JSON(response.InternalErrorResponse("uuid error"))
-		return
-	}
-	model := &model.UserModel{
-		Id: id,
-		Name: request.Name,
-		Url: request.Url,
-	}
+	model, error := userService.CreateUser(request.Name, request.Url)
 
-	userRepository := repository.UserRepository{}
-	model = userRepository.Insert(*model)
-
-	if model == nil {
-		ctx.JSON(response.InternalErrorResponse("db connection error"))
-		fmt.Println("failed to insert UserModel")
+	if error != nil {
+		ctx.JSON(error.ToResponse())
 		return
 	}
 	ctx.JSON(http.StatusOK, *model)
@@ -85,29 +72,21 @@ func (uc UserController) Update(ctx *gin.Context) {
 	userId, err := uuid.Parse(ctx.Param("userId"))
 	if err != nil {
 		fmt.Println(err.Error())
-		ctx.JSON(response.ValidationErrorResponse("invalid userId"))
+		ctx.JSON(response.ValidationError("invalid userId").ToResponse())
 		return
 	}
 
 	var request request.UserUpdateRequest
-
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		fmt.Println(err.Error())
-		ctx.JSON(response.ValidationErrorResponse("invalid request"))
+		ctx.JSON(response.ValidationError("invalid request").ToResponse())
 		return
 	}
 
-	userRepository := repository.UserRepository{}
-	model := userRepository.Select(userId)
-
-	if model == nil {
-		ctx.JSON(response.NotFoundErrorResponse("user not found"))
+	model, error:= userService.UpdateUser(userId, request.Name, request.Url)
+	if error != nil {
+		ctx.JSON(error.ToResponse())
 		return
 	}
-
-	model.Name = request.Name
-	model.Url = request.Url
-
-	model = userRepository.Update(*model)
 	ctx.JSON(http.StatusOK, *model)
 }

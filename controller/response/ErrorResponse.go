@@ -4,30 +4,31 @@ import "net/http"
 
 // エラー時のレスポンスボディ
 type ErrorResponse struct {
-	Code string `json:"code"`
+	Code int `json:"code"`
 	Message string `json:"message"`
 }
 
-func ValidationErrorResponse(message string) (int, ErrorResponse) {
-	return http.StatusBadRequest, 
-		ErrorResponse{
-			"400",
-			message,
-		}
+func (errorResponse ErrorResponse) ToResponse() (int, ErrorResponse) {
+	return errorResponse.Code, errorResponse
 }
 
-func InternalErrorResponse(message string) (int, ErrorResponse) {
-	return http.StatusInternalServerError,
-		ErrorResponse{
-			"500",
-			message,
-		}
+func ValidationError(message string) (*ErrorResponse) {
+	return &ErrorResponse{
+		http.StatusBadRequest,
+		message,
+	}
 }
 
-func NotFoundErrorResponse(message string) (int, ErrorResponse) {
-	return http.StatusNotFound,
-		ErrorResponse{
-			"404",
-			message,
-		}
+func InternalError(message string) (*ErrorResponse) {
+	return &ErrorResponse{
+		http.StatusInternalServerError,
+		message,
+	}
+}
+
+func NotFoundError(message string) (*ErrorResponse) {
+	return &ErrorResponse{
+		http.StatusNotFound,
+		message,
+	}
 }
