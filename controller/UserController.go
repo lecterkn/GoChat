@@ -56,7 +56,7 @@ func (uc UserController) Create(ctx *gin.Context) {
 		return
 	}
 
-	model, error := userService.CreateUser(request.Name, request.Url)
+	model, error := userService.CreateUser(request.Name, request.Password)
 
 	if error != nil {
 		ctx.JSON(error.ToResponse())

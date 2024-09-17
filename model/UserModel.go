@@ -5,20 +5,20 @@ import "github.com/google/uuid"
 type UserModel struct {
 	Id uuid.UUID `json:"id"`
 	Name string `json:"name"`
-	Url string `json:"url"`
+	Password []byte `json:"password"`
 }
 
 type UserTable struct {
 	Id []byte
 	Name string
-	Url string
+	Password []byte
 }
 
 func (userModel UserModel) ToTable() *UserTable {
 	return &UserTable{
 		Id: userModel.Id[:],
 		Name: userModel.Name,
-		Url: userModel.Url,
+		Password: userModel.Password,
 	}
 }
 
@@ -30,6 +30,6 @@ func (userTable UserTable) ToModel() *UserModel {
 	return &UserModel{
 		Id: id,
 		Name: userTable.Name,
-		Url: userTable.Url,
+		Password: userTable.Password,
 	}
 }

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"lecter/goserver/common"
 	"lecter/goserver/controller/response"
 	"lecter/goserver/model"
 	"lecter/goserver/repository"
@@ -36,37 +37,52 @@ func (us UserService) GetUser(id uuid.UUID) (*model.UserModel, *response.ErrorRe
 /*
  * ユーザーを作成
  */
-func (us UserService) CreateUser(name string, url string) (*model.UserModel, *response.ErrorResponse) {
+func (us UserService) CreateUser(name, password string) (*model.UserModel, *response.ErrorResponse) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, response.InternalError("failed to generate uuid")
 	}
 
+	var hashedPassword []byte
+	hashedPassword, err = common.HashPassword(password)
+
+	if err != nil {
+		return nil, response.InternalError("failed to hash password")
+	}
+
 	model := &model.UserModel{
 		Id: id,
 		Name: name,
-		Url: url,
+		Password: hashedPassword,
 	}
 
 	model, err = userRepository.Insert(*model)
 	if err != nil {
 		return nil, response.InternalError("failed to create user")
 	}
+
 	return model, nil
 }
 
 /*
  * ユーザーを更新
  */
-func (us UserService) UpdateUser(userId uuid.UUID, name string, url string) (*model.UserModel, *response.ErrorResponse) {
+func (us UserService) UpdateUser(userId uuid.UUID, name string, password string) (*model.UserModel, *response.ErrorResponse) {
 	model, err := userRepository.Select(userId)
 
 	if err != nil {
 		return nil, response.NotFoundError("user not found")
 	}
 
+	var hashedPassword []byte
+	hashedPassword, err = common.HashPassword(password)
+
+	if err != nil {
+		return nil, response.InternalError("failed to hash password")
+	}
+
 	model.Name = name
-	model.Url = url
+	model.Password = hashedPassword
 	
 	model, err = userRepository.Update(*model)
 	if err != nil {

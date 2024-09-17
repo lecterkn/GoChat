@@ -3,7 +3,7 @@ package request
 // ユーザー作成用リクエスト
 type UserCreateRequest struct {
 	Name string `json:"name" binding:"required,min=1,max=20"`
-	Url string `json:"url" binding:"required,min=1,max=1000"`
+	Password string `json:"password" binding:"required,min=6,max=32"`
 }
 
 // ユーザー更新用リクエスト
