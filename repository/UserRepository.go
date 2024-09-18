@@ -13,7 +13,7 @@ type UserRepository struct{}
 func (ur UserRepository) Insert(model model.UserModel) (*model.UserModel, error) {
 	table := model.ToTable()
 	connector := db.Database()
-	err := connector.QueryRow("INSERT INTO users (id, name, url) VALUES($1, $2, $3) RETURNING *", table.Id, table.Name, table.Password).Scan(&table.Id, &table.Name, &table.Password)
+	err := connector.QueryRow("INSERT INTO users (id, name, password) VALUES($1, $2, $3) RETURNING *", table.Id, table.Name, table.Password).Scan(&table.Id, &table.Name, &table.Password)
 	if err != nil {
 		return nil, err
 	}

@@ -9,7 +9,7 @@ import (
 
 func Routing(r *gin.Engine)  {
 	auth := service.AuthenticationService{}
-	userApi := r.Group("/api/v1/user")
+	userApi := r.Group("/api/v1/users")
 	userApi.Use(auth.BasicAuthorization)
 	// Version
 	vc := controller.VersionController{}
@@ -21,4 +21,8 @@ func Routing(r *gin.Engine)  {
 	//r.GET("/api/v1/users/:userId", uc.Select)
 	r.POST("api/v1/register", uc.Create)
 	//r.PATCH("/api/v1/users/:userId", uc.Update)
+
+	upc := controller.UserProfileController{}
+	userApi.GET("/:userId/profiles", upc.Select)
+	userApi.PUT("/:userId/profiles", upc.Update)
 }

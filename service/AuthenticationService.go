@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/base64"
+	"fmt"
 	"lecter/goserver/common"
 	"lecter/goserver/controller/response"
 	"lecter/goserver/repository"
@@ -13,6 +14,7 @@ import (
 type AuthenticationService struct{}
 
 func (as AuthenticationService) BasicAuthorization(c *gin.Context) {
+	fmt.Println("basic auth")
 	auth := c.Request.Header.Get("Authorization")
 	if auth == "" || !strings.HasPrefix(auth, "Basic ") {
 		c.Header("WWW-Authenticate", `Basic realm="Authorization Required"`)
@@ -37,6 +39,7 @@ func (as AuthenticationService) BasicAuthorization(c *gin.Context) {
 		c.Abort()
 		return 
 	}
+	c.Set("username", name)
 	c.Next()
 }
 

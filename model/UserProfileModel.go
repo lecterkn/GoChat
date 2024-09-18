@@ -30,6 +30,10 @@ func (upm UserProfileModel) ToTable() *UserProfileTable {
 	}
 }
 
+func (upm UserProfileModel) ToArray() (uuid.UUID, uuid.UUID, string, string, string) {
+	return upm.Id, upm.UserId, upm.DisplayName, upm.Url, upm.Description
+}
+
 func (upt UserProfileTable) ToModel() *UserProfileModel {
 	var id, userId uuid.UUID
 	var err error
@@ -48,4 +52,12 @@ func (upt UserProfileTable) ToModel() *UserProfileModel {
 		Url: upt.Url,
 		Description: upt.Description,
 	}
+}
+
+func (upt UserProfileTable) ToArray() (*[]byte, *[]byte, *string, *string, *string) {
+	return &upt.Id, &upt.UserId, &upt.DisplayName, &upt.Url, &upt.Description
+}
+
+func (upt UserProfileTable) ToValues() ([]byte, []byte, string, string, string) {
+	return upt.Id, upt.UserId, upt.DisplayName, upt.Url, upt.Description
 }

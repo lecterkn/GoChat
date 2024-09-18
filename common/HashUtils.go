@@ -1,6 +1,8 @@
 package common
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"golang.org/x/crypto/bcrypt"
+)
 
 const HASH_COST = 14
 
@@ -13,10 +15,5 @@ func HashPassword(password string) ([]byte, error) {
 }
 
 func HashEquals(password string, hash []byte) bool {
-	hashedPassword, err := HashPassword(password)
-	if err != nil {
-		return false
-	}
-	err = bcrypt.CompareHashAndPassword(hashedPassword, hash)
-	return err != nil
+	return bcrypt.CompareHashAndPassword(hash, []byte(password)) == nil
 }
