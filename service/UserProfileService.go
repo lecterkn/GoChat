@@ -12,7 +12,9 @@ type UserProfileService struct{}
 
 var userProfileRepository = repository.UserProfileRepository{}
 
-// ユーザーのプロフィールがない場合は新規作成、ある場合は更新
+/*
+ * ユーザーのプロフィールがない場合は新規作成、ある場合は更新
+ */
 func (ups UserProfileService) UpdateUserProfile(userId uuid.UUID, displayName, url, description string) (*model.UserProfileModel, *response.ErrorResponse) {
 	model, err := userProfileRepository.SelectByUserId(userId)
 	if err != nil {
@@ -21,6 +23,9 @@ func (ups UserProfileService) UpdateUserProfile(userId uuid.UUID, displayName, u
 	return updateUserProfile(model, displayName, url, description)
 }
 
+/*
+ * ユーザーIDからプロフィールを取得
+ */
 func (ups UserProfileService) SelectUserProfile(userId uuid.UUID) (*model.UserProfileModel, *response.ErrorResponse) {
 	model, err := userProfileRepository.SelectByUserId(userId)
 	if err != nil {

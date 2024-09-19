@@ -34,6 +34,14 @@ func (us UserService) GetUser(id uuid.UUID) (*model.UserModel, *response.ErrorRe
 	return model, nil
 }
 
+func (us UserService) GetUserByName(name string) (*model.UserModel, *response.ErrorResponse) {
+	model, err := userRepository.SelectByName(name)
+	if err != nil {
+		return nil, response.NotFoundError("user not found")
+	}
+	return model, nil
+}
+
 /*
  * ユーザーを作成
  */

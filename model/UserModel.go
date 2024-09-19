@@ -7,7 +7,7 @@ import (
 type UserModel struct {
 	Id uuid.UUID `json:"id"`
 	Name string `json:"name"`
-	Password []byte `json:"password"`
+	Password []byte `json:"-"`
 }
 
 type UserTable struct {

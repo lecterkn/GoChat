@@ -28,16 +28,15 @@ func (uc UserController) Index(ctx *gin.Context) {
 }
 
 /*
- * 特定のユーザーを取得
+ * リクエスト送信者のユーザー情報を取得
  */
 func (uc UserController) Select(ctx *gin.Context) {
-	userId, err := uuid.Parse(ctx.Param("userId"))
-	if err != nil {
-		ctx.JSON(response.ValidationError("invalid userId").ToResponse())
+	name, exists := ctx.Get("username")
+	if !exists {
+		ctx.JSON(response.ValidationError("Invalid username").ToResponse())
 		return
 	}
-
-	model, error := userService.GetUser(userId)
+	model, error := userService.GetUserByName(name.(string))
 	if error != nil {
 		ctx.JSON(error.ToResponse())
 		return
