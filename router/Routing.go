@@ -21,6 +21,7 @@ func Routing(r *gin.Engine)  {
 	uc := controller.UserController{}
 	r.POST("api/v1/register", uc.Create)
 	userApi.GET("/", uc.Select)
+	userApi.PATCH("/:userId", uc.Update)
 
 	// User Profile
 	upc := controller.UserProfileController{}

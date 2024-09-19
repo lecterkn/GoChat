@@ -16,18 +16,6 @@ type UserController struct{}
 var userService = service.UserService{}
 
 /*
- * ユーザー一覧を取得
- */
-func (uc UserController) Index(ctx *gin.Context) {
-	models, error := userService.GetUsers()
-	if error != nil {
-		ctx.JSON(error.ToResponse())
-		return
-	}
-	ctx.JSON(http.StatusOK, models)
-}
-
-/*
  * リクエスト送信者のユーザー情報を取得
  */
 func (uc UserController) Select(ctx *gin.Context) {
@@ -82,7 +70,7 @@ func (uc UserController) Update(ctx *gin.Context) {
 		return
 	}
 
-	model, error:= userService.UpdateUser(userId, request.Name, request.Url)
+	model, error:= userService.UpdateUser(userId, request.Name, request.Password)
 	if error != nil {
 		ctx.JSON(error.ToResponse())
 		return
