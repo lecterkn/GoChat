@@ -13,7 +13,7 @@ type UserRepository struct{}
 func (ur UserRepository) Insert(model model.UserModel) (*model.UserModel, error) {
 	table := model.ToTable()
 	connector := db.Database()
-	err := connector.QueryRow("INSERT INTO users (id, name, url) VALUES($1, $2, $3) RETURNING *", table.Id, table.Name, table.Url).Scan(&table.Id, &table.Name, &table.Url)
+	err := connector.QueryRow("INSERT INTO users VALUES($1, $2, $3, $4, $5) RETURNING *", table.Id, table.Name, table.Password, table.CreatedAt, table.UpdatedAt).Scan(&table.Id, &table.Name, &table.Password, &table.CreatedAt, &table.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +24,17 @@ func (ur UserRepository) Insert(model model.UserModel) (*model.UserModel, error)
 func (ur UserRepository) Select(id uuid.UUID) (*model.UserModel, error) {
 	var table model.UserTable
 	connector := db.Database()
-	err := connector.QueryRow("SELECT * FROM users WHERE id=$1", id[:]).Scan(&table.Id, &table.Name, &table.Url)
+	err := connector.QueryRow("SELECT * FROM users WHERE id=$1", id[:]).Scan(&table.Id, &table.Name, &table.Password, &table.CreatedAt, &table.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
+	return table.ToModel(), nil
+}
+
+func (ur UserRepository) SelectByName(name string) (*model.UserModel, error) {
+	var table model.UserTable
+	connector := db.Database()
+	err := connector.QueryRow("SELECT * FROM users WHERE name=$1", name).Scan(&table.Id, &table.Name, &table.Password, &table.CreatedAt, &table.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +57,7 @@ func (ur UserRepository) Index() ([]model.UserModel, error) {
 
 	for rows.Next() {
 		var table model.UserTable
-		err := rows.Scan(&table.Id, &table.Name, &table.Url)
+		err := rows.Scan(&table.Id, &table.Name, &table.Password, &table.CreatedAt, &table.UpdatedAt)
 		if err != nil {
 			fmt.Println(err.Error())
 			continue
@@ -68,7 +78,7 @@ func (ur UserRepository) Index() ([]model.UserModel, error) {
 func (ur UserRepository) Update(model model.UserModel) (*model.UserModel, error) {
 	table := model.ToTable()
 	connector := db.Database()
-	err := connector.QueryRow("UPDATE users SET name=$1, url=$2 WHERE id=$3 RETURNING *", table.Name, table.Url, table.Id).Scan(&table.Id, &table.Name, &table.Url)
+	err := connector.QueryRow("UPDATE users SET name=$1, password=$2, created_at=$3, updated_at=$4 WHERE id=$5 RETURNING *", table.Name, table.Password, table.CreatedAt, table.UpdatedAt, table.Id).Scan(&table.Id, &table.Name, &table.Password, &table.CreatedAt, &table.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}

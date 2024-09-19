@@ -32,3 +32,10 @@ func NotFoundError(message string) (*ErrorResponse) {
 		message,
 	}
 }
+
+func Unauthorized(message string) (*ErrorResponse) {
+	return &ErrorResponse{
+		http.StatusUnauthorized,
+		message,
+	}
+}

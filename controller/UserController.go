@@ -16,28 +16,17 @@ type UserController struct{}
 var userService = service.UserService{}
 
 /*
- * ユーザー一覧を取得
- */
-func (uc UserController) Index(ctx *gin.Context) {
-	models, error := userService.GetUsers()
-	if error != nil {
-		ctx.JSON(error.ToResponse())
-		return
-	}
-	ctx.JSON(http.StatusOK, models)
-}
-
-/*
- * 特定のユーザーを取得
+ * リクエスト送信者のユーザー情報を取得
  */
 func (uc UserController) Select(ctx *gin.Context) {
-	userId, err := uuid.Parse(ctx.Param("userId"))
-	if err != nil {
-		ctx.JSON(response.ValidationError("invalid userId").ToResponse())
+	// ユーザー名取得
+	name, exists := ctx.Get("username")
+	if !exists {
+		ctx.JSON(response.ValidationError("Invalid username").ToResponse())
 		return
 	}
-
-	model, error := userService.GetUser(userId)
+	// ユーザーモデルを取得
+	model, error := userService.GetUserByName(name.(string))
 	if error != nil {
 		ctx.JSON(error.ToResponse())
 		return
@@ -49,15 +38,15 @@ func (uc UserController) Select(ctx *gin.Context) {
  * ユーザーを作成
  */
 func (uc UserController) Create(ctx *gin.Context) {
+	// 作成リクエストを取得
 	var request request.UserCreateRequest
-	// バリデーションチェック
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		ctx.JSON(response.ValidationError("invalid request body").ToResponse())
 		return
 	}
 
-	model, error := userService.CreateUser(request.Name, request.Url)
-
+	// ユーザー作成
+	model, error := userService.CreateUser(request.Name, request.Password)
 	if error != nil {
 		ctx.JSON(error.ToResponse())
 		return
@@ -69,6 +58,7 @@ func (uc UserController) Create(ctx *gin.Context) {
  * ユーザーの更新
  */
 func (uc UserController) Update(ctx *gin.Context) {
+	// ユーザーID取得
 	userId, err := uuid.Parse(ctx.Param("userId"))
 	if err != nil {
 		fmt.Println(err.Error())
@@ -76,6 +66,7 @@ func (uc UserController) Update(ctx *gin.Context) {
 		return
 	}
 
+	// 更新リクエスト取得
 	var request request.UserUpdateRequest
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		fmt.Println(err.Error())
@@ -83,7 +74,8 @@ func (uc UserController) Update(ctx *gin.Context) {
 		return
 	}
 
-	model, error:= userService.UpdateUser(userId, request.Name, request.Url)
+	// ユーザー更新
+	model, error:= userService.UpdateUser(userId, request.Name, request.Password)
 	if error != nil {
 		ctx.JSON(error.ToResponse())
 		return
