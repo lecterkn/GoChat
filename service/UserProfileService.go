@@ -4,6 +4,7 @@ import (
 	"lecter/goserver/controller/response"
 	"lecter/goserver/model"
 	"lecter/goserver/repository"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -45,10 +46,12 @@ func createUserProfile(userId uuid.UUID, displayName, url, description string) (
 		DisplayName: displayName,
 		Url: url,
 		Description: description,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 	model, err = userProfileRepository.Create(*model)
 	if err != nil {
-		return nil, response.Unauthorized("failed to insert userProfiles")
+		return nil, response.InternalError("failed to insert userProfiles")
 	}
 	return model, nil
 }
@@ -58,6 +61,7 @@ func updateUserProfile(model *model.UserProfileModel, displayName, url, descript
 	model.DisplayName = displayName
 	model.Url = url
 	model.Description = description
+	model.UpdatedAt = time.Now()
 	model, err = userProfileRepository.Update(*model)
 	if err != nil {
 		return nil, response.InternalError("failed to update userProfiles")

@@ -1,6 +1,8 @@
 package model
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -10,6 +12,8 @@ type UserProfileModel struct {
 	DisplayName string  `json:"displayName"`
 	Url         string  `json:"url"`
 	Description string  `json:"description"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 type UserProfileTable struct {
@@ -18,6 +22,8 @@ type UserProfileTable struct {
 	DisplayName string `json:"displayName"`
 	Url         string `json:"url"`
 	Description string `json:"description"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 func (upm UserProfileModel) ToTable() *UserProfileTable {
@@ -27,11 +33,9 @@ func (upm UserProfileModel) ToTable() *UserProfileTable {
 		DisplayName: upm.DisplayName,
 		Url: upm.Url,
 		Description: upm.Description,
+		CreatedAt: upm.CreatedAt,
+		UpdatedAt: upm.UpdatedAt,
 	}
-}
-
-func (upm UserProfileModel) ToArray() (uuid.UUID, uuid.UUID, string, string, string) {
-	return upm.Id, upm.UserId, upm.DisplayName, upm.Url, upm.Description
 }
 
 func (upt UserProfileTable) ToModel() *UserProfileModel {
@@ -51,13 +55,7 @@ func (upt UserProfileTable) ToModel() *UserProfileModel {
 		DisplayName: upt.DisplayName,
 		Url: upt.Url,
 		Description: upt.Description,
+		CreatedAt: upt.CreatedAt,
+		UpdatedAt: upt.UpdatedAt,
 	}
-}
-
-func (upt UserProfileTable) ToArray() (*[]byte, *[]byte, *string, *string, *string) {
-	return &upt.Id, &upt.UserId, &upt.DisplayName, &upt.Url, &upt.Description
-}
-
-func (upt UserProfileTable) ToValues() ([]byte, []byte, string, string, string) {
-	return upt.Id, upt.UserId, upt.DisplayName, upt.Url, upt.Description
 }

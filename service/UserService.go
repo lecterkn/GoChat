@@ -5,6 +5,7 @@ import (
 	"lecter/goserver/controller/response"
 	"lecter/goserver/model"
 	"lecter/goserver/repository"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -34,6 +35,9 @@ func (us UserService) GetUser(id uuid.UUID) (*model.UserModel, *response.ErrorRe
 	return model, nil
 }
 
+/*
+ * ユーザー名からユーザー取得
+ */
 func (us UserService) GetUserByName(name string) (*model.UserModel, *response.ErrorResponse) {
 	model, err := userRepository.SelectByName(name)
 	if err != nil {
@@ -62,6 +66,8 @@ func (us UserService) CreateUser(name, password string) (*model.UserModel, *resp
 		Id: id,
 		Name: name,
 		Password: hashedPassword,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	model, err = userRepository.Insert(*model)
@@ -91,6 +97,7 @@ func (us UserService) UpdateUser(userId uuid.UUID, name string, password string)
 
 	model.Name = name
 	model.Password = hashedPassword
+	model.UpdatedAt = time.Now()
 	
 	model, err = userRepository.Update(*model)
 	if err != nil {

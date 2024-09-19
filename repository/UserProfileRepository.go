@@ -11,7 +11,7 @@ type UserProfileRepository struct{}
 
 func (upr UserProfileRepository) SelectByUserId(userId uuid.UUID) (*model.UserProfileModel, error) {
 	var table model.UserProfileTable
-	err := db.Database().QueryRow("SELECT * FROM user_profiles WHERE user_id=$1", userId[:]).Scan(&table.Id, &table.UserId, &table.DisplayName, &table.Url, &table.Description)
+	err := db.Database().QueryRow("SELECT * FROM user_profiles WHERE user_id=$1", userId[:]).Scan(&table.Id, &table.UserId, &table.DisplayName, &table.Url, &table.Description, &table.CreatedAt, &table.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +20,7 @@ func (upr UserProfileRepository) SelectByUserId(userId uuid.UUID) (*model.UserPr
 
 func (upr UserProfileRepository) Create(model model.UserProfileModel) (*model.UserProfileModel, error) {
 	table := model.ToTable()
-	err := db.Database().QueryRow("INSERT INTO user_profiles VALUES($1, $2, $3, $4, $5) RETURNING *", table.Id, table.UserId, table.DisplayName, table.Url, table.Description).Scan(table.ToArray())
+	err := db.Database().QueryRow("INSERT INTO user_profiles VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *", table.Id, table.UserId, table.DisplayName, table.Url, table.Description, table.CreatedAt, table.UpdatedAt).Scan(&table.Id, &table.UserId, &table.DisplayName, &table.Url, &table.Description, &table.CreatedAt, &table.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func (upr UserProfileRepository) Create(model model.UserProfileModel) (*model.Us
 
 func (upt UserProfileRepository) Update(model model.UserProfileModel) (*model.UserProfileModel, error) {
 	table := model.ToTable()
-	err := db.Database().QueryRow("UPDATE user_profiles SET user_id=$1,display_name=$2,url=$3,description=$4 WHERE id=$5 RETURNING *", table.UserId, table.DisplayName, table.Url, table.Description, table.Id).Scan(table.ToArray())
+	err := db.Database().QueryRow("UPDATE user_profiles SET user_id=$1,display_name=$2,url=$3,description=$4,created_at=$5,updated_at=$6 WHERE id=$7 RETURNING *", table.UserId, table.DisplayName, table.Url, table.Description, table.CreatedAt, table.UpdatedAt, table.Id).Scan(&table.Id, &table.UserId, &table.DisplayName, &table.Url, &table.Description, &table.CreatedAt, &table.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}

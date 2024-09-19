@@ -9,12 +9,15 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type AuthenticationService struct{}
 
+/*
+ * Basic認証を行う
+ */
 func (as AuthenticationService) BasicAuthorization(c *gin.Context) {
-	fmt.Println("basic auth")
 	auth := c.Request.Header.Get("Authorization")
 	if auth == "" || !strings.HasPrefix(auth, "Basic ") {
 		c.Header("WWW-Authenticate", `Basic realm="Authorization Required"`)
@@ -43,11 +46,27 @@ func (as AuthenticationService) BasicAuthorization(c *gin.Context) {
 	c.Next()
 }
 
+/*
+ * ユーザー名とユーザーIDの関連性があるか確認する
+ */
+func (as AuthenticationService) IsUserRelated(id uuid.UUID, name string) (*response.ErrorResponse) {
+	var userRepository = repository.UserRepository{}
+	model, err := userRepository.Select(id)
+	if err != nil {
+		return response.NotFoundError("user not found")
+	}
+	if model.Name != name {
+		return response.ValidationError("permission denied")
+	}
+	return nil
+}
+
 func basicAuthorize(username, password string) bool {
 	userRepository := repository.UserRepository{}
 	userModel, err := userRepository.SelectByName(username)
 	if err != nil {
 		return false
 	}
+	fmt.Println(password)
 	return common.HashEquals(password, userModel.Password)
 }

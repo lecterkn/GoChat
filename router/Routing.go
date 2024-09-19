@@ -8,7 +8,7 @@ import (
 )
 
 func Routing(r *gin.Engine)  {
-	// BasicAuthorization by User
+	// Basic認証のグループを設定
 	auth := service.AuthenticationService{}
 	userApi := r.Group("/api/v1/users")
 	userApi.Use(auth.BasicAuthorization)

@@ -13,7 +13,7 @@ import (
 type UserProfileController struct{}
 
 var userProfileService = service.UserProfileService{}
-var authenicateService = service.RelationAuthenticationService{}
+var authenicateService = service.AuthenticationService{}
 
 /*
  *	ユーザープロフィールを取得する
