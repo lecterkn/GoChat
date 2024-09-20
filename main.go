@@ -23,7 +23,7 @@ func main() {
 		fmt.Println("DB Connection ERROR")
 		return
 	}
-	defer db.Database().Close()
+	defer db.Close()
 
 	server := gin.Default()
 	router.Routing(server)
