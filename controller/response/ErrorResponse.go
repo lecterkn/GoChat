@@ -19,6 +19,13 @@ func ValidationError(message string) (*ErrorResponse) {
 	}
 }
 
+func ForbiddenError(message string) (*ErrorResponse) {
+	return &ErrorResponse{
+		http.StatusForbidden,
+		message,
+	}
+}
+
 func InternalError(message string) (*ErrorResponse) {
 	return &ErrorResponse{
 		http.StatusInternalServerError,

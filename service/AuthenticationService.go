@@ -2,9 +2,9 @@ package service
 
 import (
 	"encoding/base64"
-	"fmt"
 	"lecter/goserver/common"
 	"lecter/goserver/controller/response"
+	"lecter/goserver/model"
 	"lecter/goserver/repository"
 	"strings"
 
@@ -37,12 +37,14 @@ func (as AuthenticationService) BasicAuthorization(c *gin.Context) {
 	name := pair[0]
 	password := pair[1]
 
-	if (!basicAuthorize(name, password)) {
+	authorized, userModel := basicAuthorize(name, password)
+	if (!authorized) {
 		c.JSON(response.Unauthorized("invalid name or password").ToResponse())
 		c.Abort()
 		return 
 	}
-	c.Set("username", name)
+	c.Set("username", userModel.Name)
+	c.Set("userId", userModel.Id)
 	c.Next()
 }
 
@@ -61,12 +63,11 @@ func (as AuthenticationService) IsUserRelated(id uuid.UUID, name string) (*respo
 	return nil
 }
 
-func basicAuthorize(username, password string) bool {
+func basicAuthorize(username, password string) (bool, *model.UserModel) {
 	userRepository := repository.UserRepository{}
 	userModel, err := userRepository.SelectByName(username)
 	if err != nil {
-		return false
+		return false, nil
 	}
-	fmt.Println(password)
-	return common.HashEquals(password, userModel.Password)
+	return common.HashEquals(password, userModel.Password), userModel
 }
