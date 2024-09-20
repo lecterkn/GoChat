@@ -13,16 +13,6 @@ import (
 type UserService struct{}
 
 var userRepository = repository.UserRepository{}
-/*
- * ユーザー一覧を取得
- */
-func (us UserService) GetUsers() ([]model.UserModel, *response.ErrorResponse) {
-	models, err := userRepository.Index()
-	if err != nil {
-		return nil, response.InternalError("failed to get users")
-	}
-	return models, nil
-}
 
 /*
  * IDからユーザーを取得

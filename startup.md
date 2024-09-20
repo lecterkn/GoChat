@@ -28,9 +28,10 @@ go get github.com/lib/pq
 docker exec -it my_postgres psql -U postgres
 ```
 
-## DB作成
-```sql
-CREATE DATABASE mydb;
+## gormを使ったrepositoryを実装
+```shell
+go get -u gorm.io/gorm
+go get -u gorm.io/driver/postgres
 ```
 
 ## UUID
