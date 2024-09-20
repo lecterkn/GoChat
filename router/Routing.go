@@ -27,4 +27,11 @@ func Routing(r *gin.Engine)  {
 	upc := controller.UserProfileController{}
 	userApi.GET("/:userId/profiles", upc.Select)
 	userApi.PUT("/:userId/profiles", upc.Update)
+
+	cc := controller.ChannelController{}
+	userApi.GET("/channels", cc.Index)
+	userApi.POST("/channels", cc.Create)
+	userApi.GET("/channels/:channelId", cc.Select)
+	userApi.PATCH("/channels/:channelId", cc.Update)
+	userApi.DELETE("/channels/:channelId", cc.Delete)
 }
