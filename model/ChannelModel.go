@@ -11,6 +11,7 @@ type ChannelModel struct {
 	OwnerId uuid.UUID `json:"owner_id" gorm:"type:uuid;column:owner_id"`
 	Name      string `json:"name"`
 	Permission int16 `json:"permission"`
+	Deleted bool `json:"-"`
 	CreatedAt time.Time `json:"created_at" gorm:"column:created_at"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"column:updated_at"`
 }

@@ -110,6 +110,10 @@ func (ChannelService) DeleteChannel(userId, channelId uuid.UUID) (*response.Erro
 	if model.OwnerId != userId {
 		return response.ForbiddenError("permission error")
 	}
-	channelRepository.Delete(channelId)
+	model.Deleted = true
+	_, err = channelRepository.Update(*model)
+	if err != nil {
+		return response.InternalError("failed to delete channel")
+	}
 	return nil
 }

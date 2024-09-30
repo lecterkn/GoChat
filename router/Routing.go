@@ -34,4 +34,10 @@ func Routing(r *gin.Engine)  {
 	userApi.GET("/channels/:channelId", cc.Select)
 	userApi.PATCH("/channels/:channelId", cc.Update)
 	userApi.DELETE("/channels/:channelId", cc.Delete)
+
+	mc := controller.MessageController{}
+	userApi.GET("/channels/:channelId/messages", mc.Index)
+	userApi.POST("/channels/:channelId/messages", mc.Create)
+	userApi.PATCH("/channels/:channelId/messages/:messageId", mc.Update)
+	userApi.DELETE("/channels/:channelId/messages/:messageId", mc.Delete)
 }
