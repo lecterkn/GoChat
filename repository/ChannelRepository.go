@@ -11,7 +11,7 @@ type ChannelRepository struct{}
 
 func (ChannelRepository) Index() ([]model.ChannelModel, error) {
 	var models []model.ChannelModel
-	err := db.Database().Find(&models).Error
+	err := db.Database().Where("deleted = FALSE").Find(&models).Error
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +20,7 @@ func (ChannelRepository) Index() ([]model.ChannelModel, error) {
 
 func (ChannelRepository) Select(id uuid.UUID) (*model.ChannelModel, error) {
 	var model model.ChannelModel
-	err := db.Database().Where("id = ?", id[:]).First(&model).Error
+	err := db.Database().Where("id = ? AND deleted = FALSE", id[:]).First(&model).Error
 	if err != nil {
 		return nil, err
 	}
@@ -36,14 +36,9 @@ func (ChannelRepository) Create(model model.ChannelModel) (*model.ChannelModel, 
 }
 
 func (ChannelRepository) Update(model model.ChannelModel) (*model.ChannelModel, error) {
-	err := db.Database().Save(&model).Error
+	err := db.Database().Where("deleted = FALSE").Save(&model).Error
 	if err != nil {
 		return nil, err
 	}
 	return &model, nil
-}
-
-func (ChannelRepository) Delete(id uuid.UUID) error {
-	err := db.Database().Where("id = ?", id[:]).Delete(&model.ChannelModel{}).Error
-	return err
 }
