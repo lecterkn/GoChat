@@ -1,13 +1,13 @@
-# GoServer
+# UniversalTalk Backend
 
 ## DB起動
 ```shell
-docker-compose up -d
+docker-compose up
 ```
 
 ## サーバー起動
 ```shell
-go run .
+go run cmd/gochat/main.go
 ```
 
 ## マイグレーション

@@ -1,0 +1,49 @@
+name: CI
+
+# 対象のイベント
+on:
+  pull_request:
+    branches: [ "develop" ]
+
+# ジョブ設定
+jobs:
+  # testの実行
+  test:
+    # 実行環境
+    runs-on: ubuntu-latest
+    steps:
+    # リポジトリのチェックアウト
+    - name: checkout_repository
+      uses: actions/checkout@v4
+    # GO言語のセットアップ
+    - name: go_setup
+      uses: actions/setup-go@v4
+      with:
+        go-version: 1.23.1
+    # テストの実行
+    - name: go_test
+      run: go test -v ./... -coverprofile=coverage.out
+  # lintの実行
+  lint:
+    # 実行環境
+    runs-on: ubuntu-latest
+    # 権限設定
+    permissions:
+      checks: write
+      contents: read
+      pull-requests: write
+    steps:
+      # リポジトリのチェックアウト
+      - name: checkout_repository
+        uses: actions/checkout@v4
+      # レビュードッグで、lintを実行
+      - name: Run golangci-lint with Reviewdog
+        uses: reviewdog/action-golangci-lint@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          go_version: 1.23.1
+          # reviewdog の動作モードの指定
+          reporter: github-pr-review
+          # Github Status へのレポートレベルの指定
+          level: warning
+          golangci_lint_flags: "--config=.golangci.yml"
