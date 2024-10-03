@@ -2,6 +2,7 @@ package service
 
 import (
 	"lecter/goserver/internal/app/gochat/controller/response"
+	"lecter/goserver/internal/app/gochat/enum/channel_permission"
 	"lecter/goserver/internal/app/gochat/model"
 	"lecter/goserver/internal/app/gochat/repository"
 	"time"
@@ -38,12 +39,7 @@ func (ChannelService) GetChannel(id uuid.UUID) (*model.ChannelModel, *response.E
 /*
  * チャンネルを作成する
  */
-func (ChannelService) CreateChannel(userId uuid.UUID, name string, permission int16) (*model.ChannelModel, *response.ErrorResponse) {
-	// permissionのバリデーションチェック
-	if _, exists := model.PermissionMap[permission]; !exists {
-		return nil, response.ValidationError("invalid permission")
-	}
-
+func (ChannelService) CreateChannel(userId uuid.UUID, name string, permission channel_permission.ChannelPermission) (*model.ChannelModel, *response.ErrorResponse) {
 	// ID生成
 	id, err := uuid.NewV7()
 	if err != nil {
@@ -69,21 +65,13 @@ func (ChannelService) CreateChannel(userId uuid.UUID, name string, permission in
 /*
  * チャンネルを更新する
  */
-func (ChannelService) UpdateChannel(channelId, userId uuid.UUID, name string, permission int16) (*model.ChannelModel, *response.ErrorResponse) {
-	// permisssionのバリデーションチェック
-	if _, exists := model.PermissionMap[permission]; !exists {
-		return nil, response.ValidationError("invalid permission")
-	}
-
+func (ChannelService) UpdateChannel(channelId, userId uuid.UUID, name string, permission channel_permission.ChannelPermission) (*model.ChannelModel, *response.ErrorResponse) {
 	// 更新対象のチャンネルを取得
-	if _, exists := model.PermissionMap[permission]; !exists {
-		return nil, response.ValidationError("invalid permission")
-	}
 	model, err := channelRepository.Select(channelId)
 	if err != nil {
 		return nil, response.NotFoundError("channel not found")
 	}
-	if model.OwnerId != userId {
+	if !IsChannelOwner(userId, *model) {
 		return nil, response.ForbiddenError("permission error")
 	}
 
@@ -107,7 +95,7 @@ func (ChannelService) DeleteChannel(userId, channelId uuid.UUID) *response.Error
 	if err != nil {
 		return response.NotFoundError("channel not found")
 	}
-	if model.OwnerId != userId {
+	if !IsChannelOwner(userId, *model) {
 		return response.ForbiddenError("permission error")
 	}
 	model.Deleted = true
@@ -116,4 +104,8 @@ func (ChannelService) DeleteChannel(userId, channelId uuid.UUID) *response.Error
 		return response.InternalError("failed to delete channel")
 	}
 	return nil
+}
+
+func IsChannelOwner(userId uuid.UUID, channel model.ChannelModel) bool {
+	return channel.OwnerId == userId
 }

@@ -2,8 +2,10 @@ package service
 
 import (
 	"lecter/goserver/internal/app/gochat/controller/response"
+	"lecter/goserver/internal/app/gochat/enum/language"
 	"lecter/goserver/internal/app/gochat/model"
 	"lecter/goserver/internal/app/gochat/repository"
+	"lecter/goserver/internal/app/gochat/service/output"
 	"time"
 
 	"github.com/google/uuid"
@@ -11,29 +13,71 @@ import (
 
 type MessageService struct{}
 
+var messageDomainService = MessageDomainService{}
 var messageRepository = repository.MessageRepository{}
 
-func (MessageService) GetChannels(userId, channelId uuid.UUID, lastId *uuid.UUID, limit int) (*[]model.MessageModel, *response.ErrorResponse) {
+func (MessageService) GetMessages(userId, channelId uuid.UUID, lastId *uuid.UUID, limit int, langCode *string) (*output.MessageOutput, *response.ErrorResponse) {
+	// 言語を取得
+	var lang *language.Language = nil
+	if langCode != nil {
+		langu, err := language.GetLanguageFromCode(*langCode)
+		if err != nil {
+			return nil, response.ValidationError("invalid language code")
+		}
+		lang = &langu
+	}
+	// チャンネルを取得
 	channel, err := channelRepository.Select(channelId)
 	if err != nil {
 		return nil, response.NotFoundError("the channel does not exists")
 	}
+	// 権限確認
 	if !isChannelReadable(*channel, userId) {
 		return nil, response.ForbiddenError("permission error")
 	}
-	var lastCreatedAt *time.Time = nil
-	if lastId != nil {
-		lastMessage, err := messageRepository.Select(*lastId)
-		if err != nil {
-			return nil, response.ForbiddenError("last message does not exist")
+	// 原文を取得
+	if lang == nil {
+		// メッセージを一覧取得
+		models, error := messageDomainService.GetOriginalMessage(channelId, lastId, limit)
+		if error != nil {
+			return nil, error
 		}
-		lastCreatedAt = &lastMessage.CreatedAt
+		messageOutput := output.MessageOutput{
+			Messages: []output.MessageItem{},
+		}
+		for _, message := range models {
+			messageOutput.Messages = append(messageOutput.Messages, output.MessageItem{
+				Id:        message.Id,
+				ChannelId: message.ChannelId,
+				UserId:    message.UserId,
+				Message:   message.Message,
+				CreatedAt: message.CreatedAt,
+				UpdatedAt: message.UpdatedAt,
+			})
+		}
+		return &messageOutput, nil
+		// 翻訳されたメッセージを取得
+	} else {
+		// メッセージを一覧取得
+		models, error := messageDomainService.GetTranslatedMessage(channelId, lastId, limit, *lang)
+		if error != nil {
+			return nil, error
+		}
+		messageOutput := output.MessageOutput{
+			Messages: []output.MessageItem{},
+		}
+		for _, message := range models {
+			messageOutput.Messages = append(messageOutput.Messages, output.MessageItem{
+				Id:        message.Id,
+				ChannelId: message.ChannelId,
+				UserId:    message.UserId,
+				Message:   message.MessageContent,
+				CreatedAt: message.CreatedAt,
+				UpdatedAt: message.UpdatedAt,
+			})
+		}
+		return &messageOutput, nil
 	}
-	models, err := messageRepository.Index(channelId, lastId, lastCreatedAt, limit)
-	if err != nil {
-		return nil, response.InternalError("failed to get messages")
-	}
-	return models, nil
 }
 
 func (MessageService) CreateMessage(userId, channelId uuid.UUID, message string) (*model.MessageModel, *response.ErrorResponse) {
