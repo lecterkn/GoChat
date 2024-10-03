@@ -20,12 +20,6 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: 1.23.1
-    # GO言語の依存関係のダウンロード
-    - name: go_mod_download
-      run: go mod download
-    # GO言語の依存関係の整理
-    - name: go_mod_tidy
-      run: go mod tidy
     # テストの実行
     - name: go_test
       run: go test -v ./... -coverprofile=coverage.out
@@ -52,5 +46,4 @@ jobs:
           reporter: github-pr-review
           # Github Status へのレポートレベルの指定
           level: warning
-          workdir: /
           golangci_lint_flags: "--config=.golangci.yml"
