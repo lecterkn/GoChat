@@ -40,4 +40,8 @@ func Routing(r *gin.Engine) {
 	userApi.POST("/channels/:channelId/messages", mc.Create)
 	userApi.PATCH("/channels/:channelId/messages/:messageId", mc.Update)
 	userApi.DELETE("/channels/:channelId/messages/:messageId", mc.Delete)
+
+	clc := controller.ChannelLanguageController{}
+	userApi.GET("/channels/:channelId/languages", clc.Index)
+	userApi.PUT("/channels/:channelId/languages", clc.Save)
 }

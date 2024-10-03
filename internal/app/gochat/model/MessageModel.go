@@ -19,3 +19,33 @@ type MessageModel struct {
 func (MessageModel) TableName() string {
 	return "messages"
 }
+
+type MessageJapaneseModel struct {
+	ChannelId uuid.UUID `json:"channelId" gorm:"type:uuid;column:channel_id"`
+	MessageId uuid.UUID `json:"messageId" gorm:"type:uuid;column:message_id"`
+	Content   string    `json:"content"`
+}
+
+func (MessageJapaneseModel) TableName() string {
+	return "message_japanese_contents"
+}
+
+type MessageChineseModel struct {
+	ChannelId uuid.UUID `json:"channelId" gorm:"type:uuid;column:channel_id"`
+	MessageId uuid.UUID `json:"messageId" gorm:"type:uuid;column:message_id"`
+	Content   string    `json:"content"`
+}
+
+func (MessageChineseModel) TableName() string {
+	return "message_chinese_contents"
+}
+
+type MessageEnglishModel struct {
+	ChannelId uuid.UUID `json:"channelId" gorm:"type:uuid;column:channel_id"`
+	MessageId uuid.UUID `json:"messageId" gorm:"type:uuid;column:message_id"`
+	Content   string    `json:"content"`
+}
+
+func (MessageEnglishModel) TableName() string {
+	return "message_english_contents"
+}

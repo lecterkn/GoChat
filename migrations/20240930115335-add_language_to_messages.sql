@@ -14,20 +14,24 @@ CREATE TABLE message_english_contents(
     message_id UUID NOT NULL,
     content VARCHAR(511) NOT NULL
 );
-CREATE UNIQUE INDEX idx_mec_ci_mi ON message_english_contents (channel_id, message_id)
+CREATE UNIQUE INDEX idx_mec_ci_mi ON message_english_contents (channel_id, message_id);
 
 CREATE TABLE message_japanese_contents(
     channel_id UUID NOT NULL,
     message_id UUID NOT NULL,
     content VARCHAR(511) NOT NULL
 );
-CREATE UNIQUE INDEX idx_mjc_ci_mi ON message_japanese_contents (channel_id, message_id)
+CREATE UNIQUE INDEX idx_mjc_ci_mi ON message_japanese_contents (channel_id, message_id);
 
 CREATE TABLE message_chinese_contents(
     channel_id UUID NOT NULL,
     message_id UUID NOT NULL,
     content VARCHAR(511) NOT NULL
 );
-CREATE UNIQUE INDEX idx_mcc_ci_mi ON message_chinese_contents (channel_id, message_id)
+CREATE UNIQUE INDEX idx_mcc_ci_mi ON message_chinese_contents (channel_id, message_id);
 
 -- +migrate Down
+DROP TABLE message_chinese_contents;
+DROP TABLE message_english_contents;
+DROP TABLE message_japanese_contents;
+DROP TABLE channel_languages;

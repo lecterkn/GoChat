@@ -3,6 +3,7 @@ package controller
 import (
 	"lecter/goserver/internal/app/gochat/controller/request"
 	"lecter/goserver/internal/app/gochat/controller/response"
+	"lecter/goserver/internal/app/gochat/enum/channel_permission"
 	"lecter/goserver/internal/app/gochat/service"
 	"net/http"
 
@@ -24,7 +25,11 @@ func (ChannelController) Index(ctx *gin.Context) {
 		ctx.JSON(error.ToResponse())
 		return
 	}
-	ctx.JSON(http.StatusOK, models)
+	responses := []response.ChannelResponse{}
+	for _, model := range models {
+		responses = append(responses, model.ToResponse())
+	}
+	ctx.JSON(http.StatusOK, responses)
 }
 
 /*
@@ -43,7 +48,7 @@ func (ChannelController) Select(ctx *gin.Context) {
 		ctx.JSON(error.ToResponse())
 		return
 	}
-	ctx.JSON(http.StatusOK, model)
+	ctx.JSON(http.StatusOK, model.ToResponse())
 }
 
 /*
@@ -57,6 +62,13 @@ func (ChannelController) Create(ctx *gin.Context) {
 		return
 	}
 
+	// 権限のバリデーションチェック
+	permission, err := channel_permission.GetChannelPermissionFromCode(request.Permission)
+	if err != nil {
+		ctx.JSON(response.ValidationError("invalid permission code").ToResponse())
+		return
+	}
+
 	// 作成者ユーザーID取得
 	userId, exists := ctx.Get("userId")
 	if !exists {
@@ -65,12 +77,12 @@ func (ChannelController) Create(ctx *gin.Context) {
 	}
 
 	// チャンネル作成
-	model, error := channelService.CreateChannel(userId.(uuid.UUID), request.Name, *request.Permission)
+	model, error := channelService.CreateChannel(userId.(uuid.UUID), request.Name, permission)
 	if error != nil {
 		ctx.JSON(error.ToResponse())
 		return
 	}
-	ctx.JSON(http.StatusOK, model)
+	ctx.JSON(http.StatusOK, model.ToResponse())
 }
 
 /*
@@ -98,13 +110,20 @@ func (ChannelController) Update(ctx *gin.Context) {
 		return
 	}
 
+	// 権限のバリデーションチェック
+	permission, err := channel_permission.GetChannelPermissionFromCode(request.Permission)
+	if err != nil {
+		ctx.JSON(response.ValidationError("invalid permission code").ToResponse())
+		return
+	}
+
 	// チャンネルを更新
-	model, error := channelService.UpdateChannel(channelId, userId.(uuid.UUID), request.Name, *request.Permission)
+	model, error := channelService.UpdateChannel(channelId, userId.(uuid.UUID), request.Name, permission)
 	if error != nil {
 		ctx.JSON(error.ToResponse())
 		return
 	}
-	ctx.JSON(http.StatusOK, model)
+	ctx.JSON(http.StatusOK, model.ToResponse())
 }
 
 /*

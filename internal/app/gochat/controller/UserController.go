@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"lecter/goserver/internal/app/gochat/controller/request"
 	"lecter/goserver/internal/app/gochat/controller/response"
+	"lecter/goserver/internal/app/gochat/enum/language"
 	"lecter/goserver/internal/app/gochat/service"
 	"net/http"
 
@@ -31,7 +32,7 @@ func (uc UserController) Select(ctx *gin.Context) {
 		ctx.JSON(error.ToResponse())
 		return
 	}
-	ctx.JSON(http.StatusOK, model)
+	ctx.JSON(http.StatusOK, model.ToResponse())
 }
 
 /*
@@ -51,7 +52,7 @@ func (uc UserController) Create(ctx *gin.Context) {
 		ctx.JSON(error.ToResponse())
 		return
 	}
-	ctx.JSON(http.StatusOK, *model)
+	ctx.JSON(http.StatusOK, model.ToResponse())
 }
 
 /*
@@ -74,11 +75,17 @@ func (uc UserController) Update(ctx *gin.Context) {
 		return
 	}
 
+	langCode, err := language.GetLanguageFromCode(request.Language)
+	if err != nil {
+		ctx.JSON(response.ValidationError("invalid languageCode").ToResponse())
+		return
+	}
+
 	// ユーザー更新
-	model, error := userService.UpdateUser(userId, request.Name, request.Password)
+	model, error := userService.UpdateUser(userId, request.Name, langCode)
 	if error != nil {
 		ctx.JSON(error.ToResponse())
 		return
 	}
-	ctx.JSON(http.StatusOK, *model)
+	ctx.JSON(http.StatusOK, model.ToResponse())
 }

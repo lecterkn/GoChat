@@ -3,6 +3,7 @@ package service
 import (
 	"lecter/goserver/internal/app/gochat/common"
 	"lecter/goserver/internal/app/gochat/controller/response"
+	"lecter/goserver/internal/app/gochat/enum/language"
 	"lecter/goserver/internal/app/gochat/model"
 	"lecter/goserver/internal/app/gochat/repository"
 	"time"
@@ -56,6 +57,7 @@ func (us UserService) CreateUser(name, password string) (*model.UserModel, *resp
 		Id:        id,
 		Name:      name,
 		Password:  hashedPassword,
+		Language:  language.English,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -71,22 +73,14 @@ func (us UserService) CreateUser(name, password string) (*model.UserModel, *resp
 /*
  * ユーザーを更新
  */
-func (us UserService) UpdateUser(userId uuid.UUID, name string, password string) (*model.UserModel, *response.ErrorResponse) {
+func (us UserService) UpdateUser(userId uuid.UUID, name string, langCode language.Language) (*model.UserModel, *response.ErrorResponse) {
 	model, err := userRepository.Select(userId)
 
 	if err != nil {
 		return nil, response.NotFoundError("user not found")
 	}
 
-	var hashedPassword []byte
-	hashedPassword, err = common.HashPassword(password)
-
-	if err != nil {
-		return nil, response.InternalError("failed to hash password")
-	}
-
 	model.Name = name
-	model.Password = hashedPassword
 	model.UpdatedAt = time.Now()
 
 	model, err = userRepository.Update(*model)

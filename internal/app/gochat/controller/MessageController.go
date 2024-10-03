@@ -31,13 +31,13 @@ func (MessageController) Index(ctx *gin.Context) {
 		return
 	}
 	// 一覧取得リクエストを取得
-	var request request.MessageListRequest
-	if err := ctx.ShouldBindJSON(&request); err != nil {
-		ctx.JSON(response.ValidationError("invalid requestBody").ToResponse())
+	var params request.MessageListRequestParam
+	if err := ctx.Bind(&params); err != nil {
+		ctx.JSON(response.ValidationError("invalid query parameters").ToResponse())
 		return
 	}
 	// メッセージリストを取得
-	models, error := messageService.GetChannels(userId.(uuid.UUID), channelId, request.LastId, request.Limit)
+	models, error := messageService.GetMessages(userId.(uuid.UUID), channelId, params.LastId, params.Limit, params.Language)
 	if error != nil {
 		ctx.JSON(error.ToResponse())
 		return

@@ -2,9 +2,10 @@ package request
 
 import "github.com/google/uuid"
 
-type MessageListRequest struct {
-	LastId *uuid.UUID `json:"lastId"`
-	Limit  int        `json:"limit" binding:"min=5,max=100"`
+type MessageListRequestParam struct {
+	Language *string    `form:"language"`
+	LastId   *uuid.UUID `form:"lastId"`
+	Limit    int        `form:"limit" binding:"min=5,max=100"`
 }
 
 type MessageCreateRequest struct {

@@ -9,5 +9,5 @@ type UserCreateRequest struct {
 // ユーザー更新用リクエスト
 type UserUpdateRequest struct {
 	Name     string `json:"name" binding:"required,min=1,max=20"`
-	Password string `json:"password" binding:"required,min=6,max=32"`
+	Language string `json:"language" binding:"required,min=2,max=2"`
 }
