@@ -14,3 +14,7 @@ type ChannelResponse struct {
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
 }
+
+type ChannelListResponse struct {
+	List []ChannelResponse `json:"list"`
+}

@@ -29,7 +29,10 @@ func (ChannelController) Index(ctx *gin.Context) {
 	for _, model := range models {
 		responses = append(responses, model.ToResponse())
 	}
-	ctx.JSON(http.StatusOK, responses)
+	response := response.ChannelListResponse{
+		List: responses,
+	}
+	ctx.JSON(http.StatusOK, response)
 }
 
 /*
