@@ -1,4 +1,4 @@
-package service
+package authorization
 
 import (
 	"encoding/base64"
@@ -12,12 +12,10 @@ import (
 	"github.com/google/uuid"
 )
 
-type AuthenticationService struct{}
-
 /*
  * Basic認証を行う
  */
-func (as AuthenticationService) BasicAuthorization(c *gin.Context) {
+func BasicAuthorization(c *gin.Context) {
 	auth := c.Request.Header.Get("Authorization")
 	if auth == "" || !strings.HasPrefix(auth, "Basic ") {
 		c.Header("WWW-Authenticate", `Basic realm="Authorization Required"`)
@@ -37,7 +35,7 @@ func (as AuthenticationService) BasicAuthorization(c *gin.Context) {
 	name := pair[0]
 	password := pair[1]
 
-	authorized, userModel := basicAuthorize(name, password)
+	authorized, userModel := userAuthorize(name, password)
 	if !authorized {
 		c.JSON(response.Unauthorized("invalid name or password").ToResponse())
 		c.Abort()
@@ -51,7 +49,7 @@ func (as AuthenticationService) BasicAuthorization(c *gin.Context) {
 /*
  * ユーザー名とユーザーIDの関連性があるか確認する
  */
-func (as AuthenticationService) IsUserRelated(id uuid.UUID, name string) *response.ErrorResponse {
+func IsUserRelated(id uuid.UUID, name string) *response.ErrorResponse {
 	var userRepository = repository.UserRepository{}
 	model, err := userRepository.Select(id)
 	if err != nil {
@@ -63,7 +61,7 @@ func (as AuthenticationService) IsUserRelated(id uuid.UUID, name string) *respon
 	return nil
 }
 
-func basicAuthorize(username, password string) (bool, *model.UserModel) {
+func userAuthorize(username, password string) (bool, *model.UserModel) {
 	userRepository := repository.UserRepository{}
 	userModel, err := userRepository.SelectByName(username)
 	if err != nil {

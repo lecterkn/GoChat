@@ -39,6 +39,11 @@ go get -u gorm.io/driver/postgres
 go get github.com/google/uuid
 ```
 
+## .env
+```shell
+go get github.com/joho/godotenv
+```
+
 ## Swagger
 ```shell
 go get -u github.com/swaggo/swag/cmd/swag
