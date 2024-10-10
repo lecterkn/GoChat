@@ -14,12 +14,12 @@ import (
 
 func Routing(r *gin.Engine) {
 	// cors
-  	config := cors.DefaultConfig()
+	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"http://localhost:3000"}
 	config.AllowHeaders = []string{"Content-Type", "Authorization"}
 	config.AllowMethods = []string{"GET", "POST", "OPTIONS", "DELETE", "PUT", "PATCH"}
 	config.AllowCredentials = true
-  	r.Use(cors.New(config))
+	r.Use(cors.New(config))
 	// Swagger
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	// Basic認証のグループを設定

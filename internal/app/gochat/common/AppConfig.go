@@ -12,7 +12,7 @@ type AppConfig struct {
 }
 
 // configファイル
-const FileName string = "configs.json"
+const FileName string = "build/package/configs.json"
 
 // デフォルトのAppConfig
 var ApplicationConfig = AppConfig{
