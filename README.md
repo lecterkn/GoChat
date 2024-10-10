@@ -2,7 +2,7 @@
 
 ## DB起動
 ```shell
-docker-compose up
+docker compose -f build/package/docker-compose.yml up
 ```
 
 ## サーバー起動
@@ -12,5 +12,6 @@ go run cmd/gochat/main.go
 
 ## マイグレーション
 ```shell
+cd buikd/package
 sql-migrate up
 ```
