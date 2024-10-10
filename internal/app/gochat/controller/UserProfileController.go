@@ -4,6 +4,7 @@ import (
 	"lecter/goserver/internal/app/gochat/controller/request"
 	"lecter/goserver/internal/app/gochat/controller/response"
 	"lecter/goserver/internal/app/gochat/service"
+	"lecter/goserver/internal/app/gochat/service/authorization"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -13,7 +14,6 @@ import (
 type UserProfileController struct{}
 
 var userProfileService = service.UserProfileService{}
-var authenicateService = service.AuthenticationService{}
 
 /*
  *	ユーザープロフィールを取得する
@@ -51,7 +51,7 @@ func (upc UserProfileController) Update(ctx *gin.Context) {
 		return
 	}
 	// リクエスト送信者と対象のIDの一致確認
-	if error := authenicateService.IsUserRelated(userId, username.(string)); error != nil {
+	if error := authorization.IsUserRelated(userId, username.(string)); error != nil {
 		ctx.JSON(error.ToResponse())
 		return
 	}

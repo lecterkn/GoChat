@@ -8,9 +8,16 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// 環境変数を読み込む
+	if err := loadEnv(); err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
 	// configs.jsonから読み込んだConfig
 	appConfig := common.LoadConfig()
 	if appConfig != nil {
@@ -33,4 +40,12 @@ func main() {
 	if err != nil {
 		fmt.Print(err.Error())
 	}
+}
+
+func loadEnv() error {
+	err := godotenv.Load() // .envファイルの読み込み
+	if err != nil {
+		return err
+	}
+	return nil
 }

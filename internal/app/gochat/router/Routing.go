@@ -2,7 +2,7 @@ package router
 
 import (
 	"lecter/goserver/internal/app/gochat/controller"
-	"lecter/goserver/internal/app/gochat/service"
+	"lecter/goserver/internal/app/gochat/service/authorization"
 
 	_ "lecter/goserver/docs"
 
@@ -22,10 +22,10 @@ func Routing(r *gin.Engine) {
 	r.Use(cors.New(config))
 	// Swagger
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	// Basic認証のグループを設定
-	auth := service.AuthenticationService{}
+	// JWT認証のグループを設定
+	r.POST("/api/v1/login", authorization.Login)
 	userApi := r.Group("/api/v1/users")
-	userApi.Use(auth.BasicAuthorization)
+	userApi.Use(authorization.JwtAuthorization)
 
 	// Version
 	vc := controller.VersionController{}
