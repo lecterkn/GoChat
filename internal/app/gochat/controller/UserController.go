@@ -52,6 +52,12 @@ func (uc UserController) Create(ctx *gin.Context) {
 		ctx.JSON(error.ToResponse())
 		return
 	}
+	// デフォルトのプロフィールを作成
+	_, error = userProfileService.UpdateUserProfile(model.Id, model.Name, "nothing here", "no descrption")
+	if error != nil {
+		ctx.JSON(error.ToResponse())
+		return
+	}
 	ctx.JSON(http.StatusOK, model.ToResponse())
 }
 
