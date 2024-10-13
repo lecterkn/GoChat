@@ -1,6 +1,9 @@
 package service
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
 	"lecter/goserver/internal/app/gochat/controller/response"
 	"lecter/goserver/internal/app/gochat/enum/language"
 	"lecter/goserver/internal/app/gochat/model"
@@ -9,10 +12,19 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/redis/go-redis/v9"
 )
 
 type MessageService struct{}
 
+var redisService = RedisService{
+	Context: context.TODO(),
+	Client: *redis.NewClient(&redis.Options{
+		Addr:     "127.0.0.1:6379",
+		Password: "",
+		DB:       0,
+	}),
+}
 var messageDomainService = MessageDomainService{}
 var messageRepository = repository.MessageRepository{}
 
@@ -105,6 +117,21 @@ func (MessageService) CreateMessage(userId, channelId uuid.UUID, message string)
 	if err != nil {
 		return nil, response.InternalError("failed to create message")
 	}
+	// ブロードキャスト
+	messageJson, err := json.Marshal(model)
+	if err != nil {
+		fmt.Println("failed to unmarshal message")
+	}
+	_, err = redisService.Publish(Broadcast, RedisMessage{
+		SrcUser: model.UserId,
+		Event:   Message,
+		Message: string(messageJson),
+	})
+	if err != nil {
+		fmt.Println(err.Error())
+		fmt.Println("failed to publish message")
+	}
+	// TODO redisのエラー処理
 	return model, nil
 }
 

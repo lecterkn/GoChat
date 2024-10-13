@@ -44,6 +44,11 @@ go get github.com/google/uuid
 go get github.com/joho/godotenv
 ```
 
+## redis
+```shell
+go get github.com/redis/go-redis/v9
+```
+
 ## Swagger
 ```shell
 go get -u github.com/swaggo/swag/cmd/swag
