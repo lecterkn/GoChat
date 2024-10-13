@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
@@ -18,6 +19,10 @@ type MessageModel struct {
 
 func (MessageModel) TableName() string {
 	return "messages"
+}
+
+func (mm MessageModel) MarshalBinary() ([]byte, error) {
+	return json.Marshal(mm)
 }
 
 type MessageJapaneseModel struct {
