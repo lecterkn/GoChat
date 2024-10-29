@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"lecter/goserver/internal/app/gochat/common"
-	"lecter/goserver/internal/app/gochat/db"
-	"lecter/goserver/internal/app/gochat/router"
+	"lecter/goserver/internal/app/gochat/infrastructure/db"
+	"lecter/goserver/internal/app/gochat/presentation/router"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -31,6 +31,7 @@ func main() {
 		return
 	}
 	defer db.Close()
+
 
 	server := gin.Default()
 	router.Routing(server)
