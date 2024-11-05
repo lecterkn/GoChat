@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type BasicAuthorizationService struct{
+type BasicAuthorizationService struct {
 	userRepository repository.UserRepository
 }
 

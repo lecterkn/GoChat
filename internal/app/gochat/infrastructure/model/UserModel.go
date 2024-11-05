@@ -8,12 +8,12 @@ import (
 )
 
 type UserModel struct {
-	Id        uuid.UUID         `gorm:"type:uuid"`
-	Name      string            
-	Password  []byte            
-	Language  language.Language 
-	CreatedAt time.Time         `gorm:"column:created_at"`
-	UpdatedAt time.Time         `gorm:"column:updated_at"`
+	Id        uuid.UUID `gorm:"type:uuid"`
+	Name      string
+	Password  []byte
+	Language  language.Language
+	CreatedAt time.Time `gorm:"column:created_at"`
+	UpdatedAt time.Time `gorm:"column:updated_at"`
 }
 
 func (UserModel) TableName() string {

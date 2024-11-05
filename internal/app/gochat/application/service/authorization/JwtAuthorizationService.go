@@ -19,6 +19,12 @@ type JwtAuthorizationService struct {
 	UserRepository repository.UserRepository
 }
 
+func NewJwtAuthorizationService(userRepository repository.UserRepository) *JwtAuthorizationService {
+	return &JwtAuthorizationService{
+		UserRepository: userRepository,
+	}
+}
+
 /*
  * JWT認証を行うミドルウェア
  */

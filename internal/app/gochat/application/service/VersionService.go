@@ -7,6 +7,10 @@ import (
 
 type VersionService struct{}
 
+func NewVersionService() VersionService {
+	return VersionService{}
+}
+
 /*
  * アプリケーションコンフィグのバージョン情報を取得
  */

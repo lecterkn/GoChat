@@ -10,8 +10,14 @@ import (
 	"github.com/google/uuid"
 )
 
-type ChannelService struct{
+type ChannelService struct {
 	ChannelRepository repository.ChannelRepository
+}
+
+func NewChannelService(channelRepository repository.ChannelRepository) ChannelService {
+	return ChannelService{
+		ChannelRepository: channelRepository,
+	}
 }
 
 /*

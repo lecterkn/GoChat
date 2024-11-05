@@ -36,5 +36,8 @@ func Close() error {
 }
 
 func Database() *gorm.DB {
+	if database == nil {
+		Connect()
+	}
 	return database
 }

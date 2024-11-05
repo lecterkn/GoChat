@@ -1,15 +1,23 @@
-package implemenst
+package implements
 
 import (
+	"gorm.io/gorm"
 	"lecter/goserver/internal/app/gochat/domain/entity"
 	"lecter/goserver/internal/app/gochat/domain/enum/language"
-	"lecter/goserver/internal/app/gochat/infrastructure/db"
 	"lecter/goserver/internal/app/gochat/infrastructure/model"
 
 	"github.com/google/uuid"
 )
 
-type MessageRepositoryImpl struct{}
+type MessageRepositoryImpl struct {
+	Database *gorm.DB
+}
+
+func NewMessageRepositoryImpl(database *gorm.DB) MessageRepositoryImpl {
+	return MessageRepositoryImpl{
+		Database: database,
+	}
+}
 
 func (mr MessageRepositoryImpl) Index(
 	channelId uuid.UUID,
@@ -18,14 +26,14 @@ func (mr MessageRepositoryImpl) Index(
 	var models []model.MessageModel
 	var err error
 	if lastMessage == nil {
-		err = db.Database().
+		err = mr.Database.
 			Where("channel_id = ?", channelId[:]).
 			Where("deleted = FALSE").
 			Order("created_at DESC, id").
 			Limit(limit).
 			Find(&models).Error
 	} else {
-		err = db.Database().
+		err = mr.Database.
 			Where("channel_id = ?", channelId[:]).
 			Where("(created_at < ? OR created_at = ? AND id > ?)", lastMessage.CreatedAt, lastMessage.CreatedAt, lastMessage.Id[:]).
 			Where("deleted = FALSE").
@@ -51,7 +59,7 @@ func (mr MessageRepositoryImpl) TranslatedMessageIndex(
 	var models []model.TranslatedMessageModel
 	var err error
 	if lastMessage == nil {
-		err = db.Database().
+		err = mr.Database.
 			Select("messages.*, COALESCE("+lang.TableName()+".content, messages.message) AS message_content").
 			Joins("LEFT JOIN "+lang.TableName()+" ON "+lang.TableName()+".channel_id = messages.channel_id AND "+lang.TableName()+".message_id = messages.id").
 			Where("messages.channel_id = ?", channelId[:]).
@@ -60,7 +68,7 @@ func (mr MessageRepositoryImpl) TranslatedMessageIndex(
 			Limit(limit).
 			Find(&models).Error
 	} else {
-		err = db.Database().
+		err = mr.Database.
 			Select("messages.*, COALESCE(message_?_contents.content, messages.message) AS message_content", lang.ToName()).
 			Joins("LEFT JOIN message_?_contents ON message_?_contents.channel_id = messages.channel_id AND message_?_contents.message_id = messages.id", lang.ToName(), lang.ToName(), lang.ToName()).
 			Where("channel_id = ?", channelId[:]).
@@ -82,7 +90,7 @@ func (mr MessageRepositoryImpl) TranslatedMessageIndex(
 
 func (r MessageRepositoryImpl) Select(id uuid.UUID) (*entity.MessageEntity, error) {
 	var model model.MessageModel
-	err := db.Database().Where("id = ? AND deleted = FALSE", id[:]).First(&model).Error
+	err := r.Database.Where("id = ? AND deleted = FALSE", id[:]).First(&model).Error
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +100,7 @@ func (r MessageRepositoryImpl) Select(id uuid.UUID) (*entity.MessageEntity, erro
 
 func (r MessageRepositoryImpl) Create(entity entity.MessageEntity) (*entity.MessageEntity, error) {
 	model := r.toModel(entity)
-	err := db.Database().Create(&model).Error
+	err := r.Database.Create(&model).Error
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +110,7 @@ func (r MessageRepositoryImpl) Create(entity entity.MessageEntity) (*entity.Mess
 
 func (r MessageRepositoryImpl) Update(entity entity.MessageEntity) (*entity.MessageEntity, error) {
 	model := r.toModel(entity)
-	err := db.Database().Where("deleted = FALSE").Save(&model).Error
+	err := r.Database.Where("deleted = FALSE").Save(&model).Error
 	if err != nil {
 		return nil, err
 	}
@@ -110,37 +118,14 @@ func (r MessageRepositoryImpl) Update(entity entity.MessageEntity) (*entity.Mess
 	return &entity, nil
 }
 
-func (MessageRepositoryImpl) toModel(entity entity.MessageEntity) (model.MessageModel) {
-	return model.MessageModel{
-		Id: entity.Id,
-		ChannelId: entity.ChannelId,
-		UserId: entity.UserId,
-		Deleted: entity.Deleted,
-		CreatedAt: entity.CreatedAt,
-		UpdatedAt: entity.UpdatedAt,
-	}
+func (MessageRepositoryImpl) toModel(entity entity.MessageEntity) model.MessageModel {
+	return model.MessageModel(entity)
 }
 
-func (MessageRepositoryImpl) toEntity(model model.MessageModel) (entity.MessageEntity) {
-	return entity.MessageEntity{
-		Id: model.Id,
-		ChannelId: model.ChannelId,
-		UserId: model.UserId,
-		Message: model.Message,
-		Deleted: model.Deleted,
-		CreatedAt: model.CreatedAt,
-		UpdatedAt: model.UpdatedAt,
-	}
+func (MessageRepositoryImpl) toEntity(model model.MessageModel) entity.MessageEntity {
+	return entity.MessageEntity(model)
 }
 
-func (MessageRepositoryImpl) toTranslatedEntity(model model.TranslatedMessageModel) (entity.TranslatedMessageEntity) {
-	return entity.TranslatedMessageEntity{
-		Id: model.Id,
-		ChannelId: model.ChannelId,
-		UserId: model.UserId,
-		MessageContent: model.MessageContent,
-		Deleted: model.Deleted,
-		CreatedAt: model.CreatedAt,
-		UpdatedAt: model.UpdatedAt,
-	}
+func (MessageRepositoryImpl) toTranslatedEntity(model model.TranslatedMessageModel) entity.TranslatedMessageEntity {
+	return entity.TranslatedMessageEntity(model)
 }

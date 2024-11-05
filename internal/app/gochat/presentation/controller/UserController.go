@@ -12,9 +12,16 @@ import (
 	"github.com/google/uuid"
 )
 
-type UserController struct{
-	UserService service.UserService
+type UserController struct {
+	UserService        service.UserService
 	UserProfileService service.UserProfileService
+}
+
+func NewUserController(userService service.UserService, userProfileService service.UserProfileService) UserController {
+	return UserController{
+		UserService:        userService,
+		UserProfileService: userProfileService,
+	}
 }
 
 /*

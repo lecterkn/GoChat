@@ -14,6 +14,12 @@ type MessageController struct {
 	MessageService service.MessageService
 }
 
+func NewMessageController(messageService service.MessageService) MessageController {
+	return MessageController{
+		MessageService: messageService,
+	}
+}
+
 /*
  * メッセージ一覧を取得する
  */

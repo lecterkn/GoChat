@@ -10,6 +10,11 @@ type VersionController struct {
 	VersionService service.VersionService
 }
 
+func NewVersionController(versionService service.VersionService) VersionController {
+	return VersionController{
+		VersionService: versionService,
+	}
+}
 
 // @Summary バージョンを取得
 // @Accept json

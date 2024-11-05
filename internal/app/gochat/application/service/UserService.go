@@ -11,8 +11,14 @@ import (
 	"github.com/google/uuid"
 )
 
-type UserService struct{
+type UserService struct {
 	UserRepository repository.UserRepository
+}
+
+func NewUserService(userRepository repository.UserRepository) UserService {
+	return UserService{
+		UserRepository: userRepository,
+	}
 }
 
 /*

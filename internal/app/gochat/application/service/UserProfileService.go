@@ -13,6 +13,12 @@ type UserProfileService struct {
 	UserProfileRepository repository.UserProfileRepository
 }
 
+func NewUserProfileService(userProfileRepository repository.UserProfileRepository) UserProfileService {
+	return UserProfileService{
+		UserProfileRepository: userProfileRepository,
+	}
+}
+
 /*
  * ユーザーのプロフィールがない場合は新規作成、ある場合は更新
  */

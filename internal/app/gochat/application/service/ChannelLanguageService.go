@@ -14,6 +14,16 @@ type ChannelLanguageService struct {
 	ChannelLanguageRepository repository.ChannelLanguageRepository
 }
 
+func NewChannelLanguageService (
+	channelRepository repository.ChannelRepository,
+	channelLanguageRepository repository.ChannelLanguageRepository,
+	) ChannelLanguageService {
+	return ChannelLanguageService{
+		ChannelRepository: channelRepository,
+		ChannelLanguageRepository: channelLanguageRepository,
+	}
+}
+
 func (cls ChannelLanguageService) GetChannelLanguages(channelId uuid.UUID) ([]entity.ChannelLanguageEntity, *response.ErrorResponse) {
 	models, err := cls.ChannelLanguageRepository.Index(channelId)
 	if err != nil {

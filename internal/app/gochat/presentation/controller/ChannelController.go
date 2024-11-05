@@ -11,9 +11,16 @@ import (
 	"github.com/google/uuid"
 )
 
-type ChannelController struct{
+type ChannelController struct {
 	ChannelService service.ChannelService
 }
+
+func NewChannelController(channelService service.ChannelService) ChannelController {
+	return ChannelController{
+		ChannelService: channelService,
+	}
+}
+
 /*
  * チャンネル一覧を取得する
  */

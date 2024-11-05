@@ -42,6 +42,17 @@ type RedisService struct {
 	Client  redis.Client
 }
 
+func NewRedisService() RedisService {
+	return RedisService{
+		Context: context.TODO(),
+		Client: *redis.NewClient(&redis.Options{
+			Addr:     "127.0.0.1:6379",
+			Password: "",
+			DB:       0,
+		}),
+	}
+}
+
 func (rs RedisService) Publish(channel RedisChannel, message RedisMessage) (int64, error) {
 	return rs.Client.Publish(rs.Context, channel.ToString(), message).Result()
 }

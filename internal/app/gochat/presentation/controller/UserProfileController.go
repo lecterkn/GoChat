@@ -10,8 +10,14 @@ import (
 	"github.com/google/uuid"
 )
 
-type UserProfileController struct{
+type UserProfileController struct {
 	UserProfileService service.UserProfileService
+}
+
+func NewUserProfileController(userProfileService service.UserProfileService) UserProfileController {
+	return UserProfileController{
+		UserProfileService: userProfileService,
+	}
 }
 
 /*

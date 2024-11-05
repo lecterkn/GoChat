@@ -32,7 +32,6 @@ func main() {
 	}
 	defer db.Close()
 
-
 	server := gin.Default()
 	router.Routing(server)
 

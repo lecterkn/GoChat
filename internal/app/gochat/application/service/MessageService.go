@@ -20,6 +20,20 @@ type MessageService struct{
 	RedisService RedisService
 }
 
+func NewMessageService(
+	messageRepository repository.MessageRepository,
+	channelRepository repository.ChannelRepository,
+	messageDomainService MessageDomainService,
+	redisService RedisService,
+	) MessageService {
+	return MessageService{
+		MessageRepository: messageRepository,
+		ChannelRepository: channelRepository,
+		MessageDomainService: messageDomainService,
+		RedisService: redisService,
+	}
+}
+
 func (ms MessageService) GetMessages(userId, channelId uuid.UUID, lastId *uuid.UUID, limit int, langCode *string) (*output.MessageOutput, *response.ErrorResponse) {
 	// 言語を取得
 	var lang *language.Language = nil

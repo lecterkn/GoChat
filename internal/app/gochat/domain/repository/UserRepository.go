@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"lecter/goserver/internal/app/gochat/domain/entity"
 	"github.com/google/uuid"
+	"lecter/goserver/internal/app/gochat/domain/entity"
 )
 
 type UserRepository interface {

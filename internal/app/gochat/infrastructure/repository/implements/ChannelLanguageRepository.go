@@ -1,18 +1,26 @@
-package implemenst
+package implements
 
 import (
+	"gorm.io/gorm"
 	"lecter/goserver/internal/app/gochat/domain/entity"
-	"lecter/goserver/internal/app/gochat/infrastructure/db"
 	"lecter/goserver/internal/app/gochat/infrastructure/model"
 
 	"github.com/google/uuid"
 )
 
-type ChannelLanguageRepositoryImpl struct{}
+type ChannelLanguageRepositoryImpl struct {
+	Database *gorm.DB
+}
+
+func NewChannelLanguageRepositoryImpl(database *gorm.DB) ChannelLanguageRepositoryImpl {
+	return ChannelLanguageRepositoryImpl{
+		Database: database,
+	}
+}
 
 func (r ChannelLanguageRepositoryImpl) Index(channelId uuid.UUID) ([]entity.ChannelLanguageEntity, error) {
 	var models []model.ChannelLanguageModel
-	err := db.Database().Where("channel_id = ?", channelId[:]).Find(&models).Error
+	err := r.Database.Where("channel_id = ?", channelId[:]).Find(&models).Error
 	if err != nil {
 		return nil, err
 	}
@@ -23,8 +31,8 @@ func (r ChannelLanguageRepositoryImpl) Index(channelId uuid.UUID) ([]entity.Chan
 	return entity, nil
 }
 
-func (ChannelLanguageRepositoryImpl) Delete(channelId uuid.UUID) error {
-	err := db.Database().Where("channel_id = ?", channelId[:]).Delete(&model.ChannelLanguageModel{}).Error
+func (r ChannelLanguageRepositoryImpl) Delete(channelId uuid.UUID) error {
+	err := r.Database.Where("channel_id = ?", channelId[:]).Delete(&model.ChannelLanguageModel{}).Error
 	if err != nil {
 		return err
 	}
@@ -36,7 +44,7 @@ func (r ChannelLanguageRepositoryImpl) InsertAll(entities []entity.ChannelLangua
 	for _, entity := range entities {
 		models = append(models, r.toModel(entity))
 	}
-	err := db.Database().Create(models).Error
+	err := r.Database.Create(models).Error
 	if err != nil {
 		return nil, err
 	}
@@ -47,10 +55,10 @@ func (r ChannelLanguageRepositoryImpl) InsertAll(entities []entity.ChannelLangua
 	return entities, nil
 }
 
-func (ChannelLanguageRepositoryImpl) toModel(entity entity.ChannelLanguageEntity) (model.ChannelLanguageModel) {
+func (ChannelLanguageRepositoryImpl) toModel(entity entity.ChannelLanguageEntity) model.ChannelLanguageModel {
 	return model.ChannelLanguageModel(entity)
 }
 
-func (ChannelLanguageRepositoryImpl) toEntity(model model.ChannelLanguageModel) (entity.ChannelLanguageEntity) {
+func (ChannelLanguageRepositoryImpl) toEntity(model model.ChannelLanguageModel) entity.ChannelLanguageEntity {
 	return entity.ChannelLanguageEntity(model)
 }

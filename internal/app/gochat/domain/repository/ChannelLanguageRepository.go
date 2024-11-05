@@ -8,6 +8,6 @@ import (
 
 type ChannelLanguageRepository interface {
 	Index(channelId uuid.UUID) ([]entity.ChannelLanguageEntity, error)
-	Delete(channelId uuid.UUID) (error)
+	Delete(channelId uuid.UUID) error
 	InsertAll(entity []entity.ChannelLanguageEntity) ([]entity.ChannelLanguageEntity, error)
 }

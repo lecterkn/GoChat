@@ -13,6 +13,12 @@ type MessageDomainService struct {
 	MessageRepository repository.MessageRepository
 }
 
+func NewMessageDomainService(messageRepository repository.MessageRepository) MessageDomainService {
+	return MessageDomainService{
+		MessageRepository: messageRepository,
+	}
+}
+
 func (mds MessageDomainService) GetOriginalMessage(channelId uuid.UUID, lastMessageId *uuid.UUID, limit int) ([]entity.MessageEntity, *response.ErrorResponse) {
 	// 1ページ目
 	if lastMessageId == nil {

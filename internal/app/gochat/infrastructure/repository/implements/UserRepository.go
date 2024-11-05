@@ -1,18 +1,26 @@
-package implemenst
+package implements
 
 import (
+	"gorm.io/gorm"
 	"lecter/goserver/internal/app/gochat/domain/entity"
-	"lecter/goserver/internal/app/gochat/infrastructure/db"
 	"lecter/goserver/internal/app/gochat/infrastructure/model"
 
 	"github.com/google/uuid"
 )
 
-type UserRepositoryImpl struct{}
+type UserRepositoryImpl struct {
+	Database *gorm.DB
+}
+
+func NewUserRepositoryImpl(database *gorm.DB) UserRepositoryImpl {
+	return UserRepositoryImpl{
+		Database: database,
+	}
+}
 
 func (ur UserRepositoryImpl) Insert(entity entity.UserEntity) (*entity.UserEntity, error) {
 	model := ur.toModel(entity)
-	err := db.Database().Create(&model).Error
+	err := ur.Database.Create(&model).Error
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +30,7 @@ func (ur UserRepositoryImpl) Insert(entity entity.UserEntity) (*entity.UserEntit
 
 func (ur UserRepositoryImpl) Select(id uuid.UUID) (*entity.UserEntity, error) {
 	var model model.UserModel
-	err := db.Database().Where("id = ?", id[:]).First(&model).Error
+	err := ur.Database.Where("id = ?", id[:]).First(&model).Error
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +40,7 @@ func (ur UserRepositoryImpl) Select(id uuid.UUID) (*entity.UserEntity, error) {
 
 func (ur UserRepositoryImpl) SelectByName(name string) (*entity.UserEntity, error) {
 	var model model.UserModel
-	err := db.Database().Where("name = ?", name).First(&model).Error
+	err := ur.Database.Where("name = ?", name).First(&model).Error
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +50,7 @@ func (ur UserRepositoryImpl) SelectByName(name string) (*entity.UserEntity, erro
 
 func (ur UserRepositoryImpl) Update(entity entity.UserEntity) (*entity.UserEntity, error) {
 	model := ur.toModel(entity)
-	err := db.Database().Save(&model).Error
+	err := ur.Database.Save(&model).Error
 	if err != nil {
 		return nil, err
 	}
@@ -50,24 +58,10 @@ func (ur UserRepositoryImpl) Update(entity entity.UserEntity) (*entity.UserEntit
 	return &entity, nil
 }
 
-func (UserRepositoryImpl) toModel(entity entity.UserEntity) (model.UserModel) {
-	return model.UserModel{
-		Id: entity.Id,
-		Name: entity.Name,
-		Password: entity.Password,
-		Language: entity.Language,
-		CreatedAt: entity.CreatedAt,
-		UpdatedAt: entity.UpdatedAt,
-	}
+func (UserRepositoryImpl) toModel(entity entity.UserEntity) model.UserModel {
+	return model.UserModel(entity)
 }
 
-func (UserRepositoryImpl) toEntity(model model.UserModel) (entity.UserEntity) {
-	return entity.UserEntity{
-		Id: model.Id,
-		Name: model.Name,
-		Password: model.Password,
-		Language: model.Language,
-		CreatedAt: model.CreatedAt,
-		UpdatedAt: model.UpdatedAt,
-	}
+func (UserRepositoryImpl) toEntity(model model.UserModel) entity.UserEntity {
+	return entity.UserEntity(model)
 }

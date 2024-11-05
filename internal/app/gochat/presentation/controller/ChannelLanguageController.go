@@ -15,6 +15,12 @@ type ChannelLanguageController struct {
 	ChannelLanguageService service.ChannelLanguageService
 }
 
+func NewChannelLanguageController(channelLanguageService service.ChannelLanguageService) ChannelLanguageController {
+	return ChannelLanguageController{
+		ChannelLanguageService: channelLanguageService,
+	}
+}
+
 /*
  * チャンネルの言語一覧を取得
  */
