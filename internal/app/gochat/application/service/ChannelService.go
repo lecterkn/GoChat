@@ -1,6 +1,8 @@
 package service
 
 import (
+	"encoding/json"
+	"fmt"
 	"lecter/goserver/internal/app/gochat/domain/entity"
 	"lecter/goserver/internal/app/gochat/domain/enum/channel_permission"
 	"lecter/goserver/internal/app/gochat/domain/repository"
@@ -12,11 +14,13 @@ import (
 
 type ChannelService struct {
 	ChannelRepository repository.ChannelRepository
+	RedisService      RedisService
 }
 
-func NewChannelService(channelRepository repository.ChannelRepository) ChannelService {
+func NewChannelService(channelRepository repository.ChannelRepository, redisService RedisService) ChannelService {
 	return ChannelService{
 		ChannelRepository: channelRepository,
+		RedisService:      redisService,
 	}
 }
 
@@ -65,6 +69,21 @@ func (cs ChannelService) CreateChannel(userId uuid.UUID, name string, permission
 	if err != nil {
 		return nil, response.InternalError("failed to create channel")
 	}
+	// jsonに変換
+	messageJson, err := json.Marshal(model.ToResponse())
+	if err != nil {
+		fmt.Println("failed to unmarshal message")
+	}
+	// redisにパブリッシュ
+	_, err = cs.RedisService.Publish(Broadcast, RedisMessage{
+		SrcUser: model.OwnerId,
+		Event:   AddChannel,
+		Message: string(messageJson),
+	})
+	if err != nil {
+		fmt.Println(err.Error())
+		fmt.Println("failed to publish message")
+	}
 	return model, nil
 }
 
@@ -90,6 +109,21 @@ func (cs ChannelService) UpdateChannel(channelId, userId uuid.UUID, name string,
 	if error != nil {
 		return nil, response.InternalError("failed to update channel")
 	}
+	// jsonに変換
+	messageJson, err := json.Marshal(model.ToResponse())
+	if err != nil {
+		fmt.Println("failed to unmarshal message")
+	}
+	// redisにパブリッシュ
+	_, err = cs.RedisService.Publish(Broadcast, RedisMessage{
+		SrcUser: model.OwnerId,
+		Event:   UpdateChannel,
+		Message: string(messageJson),
+	})
+	if err != nil {
+		fmt.Println(err.Error())
+		fmt.Println("failed to publish message")
+	}
 	return model, nil
 }
 
@@ -108,6 +142,21 @@ func (cs ChannelService) DeleteChannel(userId, channelId uuid.UUID) *response.Er
 	_, err = cs.ChannelRepository.Update(*model)
 	if err != nil {
 		return response.InternalError("failed to delete channel")
+	}
+	// jsonに変換
+	messageJson, err := json.Marshal(model.ToResponse())
+	if err != nil {
+		fmt.Println("failed to unmarshal message")
+	}
+	// redisにパブリッシュ
+	_, err = cs.RedisService.Publish(Broadcast, RedisMessage{
+		SrcUser: model.OwnerId,
+		Event:   RemoveChannel,
+		Message: string(messageJson),
+	})
+	if err != nil {
+		fmt.Println(err.Error())
+		fmt.Println("failed to publish message")
 	}
 	return nil
 }

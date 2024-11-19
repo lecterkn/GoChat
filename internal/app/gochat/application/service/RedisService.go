@@ -21,6 +21,9 @@ const (
 	AddMessage    = RedisMessageEvent("add_message")
 	UpdateMessage = RedisMessageEvent("update_message")
 	DeleteMessage = RedisMessageEvent("delete_message")
+	AddChannel    = RedisMessageEvent("add_channel")
+	UpdateChannel = RedisMessageEvent("update_channel")
+	RemoveChannel = RedisMessageEvent("remove_channel")
 )
 
 func (rc RedisChannel) ToString() string {

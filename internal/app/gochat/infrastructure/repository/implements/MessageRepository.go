@@ -29,7 +29,7 @@ func (mr MessageRepositoryImpl) Index(
 		err = mr.Database.
 			Where("channel_id = ?", channelId[:]).
 			Where("deleted = FALSE").
-			Order("created_at DESC, id").
+			Order("id").
 			Limit(limit).
 			Find(&models).Error
 	} else {
@@ -37,7 +37,7 @@ func (mr MessageRepositoryImpl) Index(
 			Where("channel_id = ?", channelId[:]).
 			Where("(created_at < ? OR created_at = ? AND id > ?)", lastMessage.CreatedAt, lastMessage.CreatedAt, lastMessage.Id[:]).
 			Where("deleted = FALSE").
-			Order("created_at DESC, id").
+			Order("id").
 			Limit(limit).
 			Find(&models).Error
 	}
@@ -64,7 +64,7 @@ func (mr MessageRepositoryImpl) TranslatedMessageIndex(
 			Joins("LEFT JOIN "+lang.TableName()+" ON "+lang.TableName()+".channel_id = messages.channel_id AND "+lang.TableName()+".message_id = messages.id").
 			Where("messages.channel_id = ?", channelId[:]).
 			Where("messages.deleted = FALSE").
-			Order("created_at DESC, id").
+			Order("id DESC").
 			Limit(limit).
 			Find(&models).Error
 	} else {
@@ -74,7 +74,7 @@ func (mr MessageRepositoryImpl) TranslatedMessageIndex(
 			Where("channel_id = ?", channelId[:]).
 			Where("(created_at < ? OR created_at = ? AND id > ?)", lastMessage.CreatedAt, lastMessage.CreatedAt, lastMessage.Id[:]).
 			Where("deleted = FALSE").
-			Order("created_at DESC, id").
+			Order("id DESC").
 			Limit(limit).
 			Find(&models).Error
 	}
