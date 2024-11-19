@@ -13,11 +13,11 @@ import (
 	"github.com/google/uuid"
 )
 
-type MessageService struct{
-	MessageRepository repository.MessageRepository
-  	ChannelRepository repository.ChannelRepository
+type MessageService struct {
+	MessageRepository    repository.MessageRepository
+	ChannelRepository    repository.ChannelRepository
 	MessageDomainService MessageDomainService
-	RedisService RedisService
+	RedisService         RedisService
 }
 
 func NewMessageService(
@@ -25,12 +25,12 @@ func NewMessageService(
 	channelRepository repository.ChannelRepository,
 	messageDomainService MessageDomainService,
 	redisService RedisService,
-	) MessageService {
+) MessageService {
 	return MessageService{
-		MessageRepository: messageRepository,
-		ChannelRepository: channelRepository,
+		MessageRepository:    messageRepository,
+		ChannelRepository:    channelRepository,
 		MessageDomainService: messageDomainService,
-		RedisService: redisService,
+		RedisService:         redisService,
 	}
 }
 

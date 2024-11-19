@@ -1,10 +1,10 @@
 package router
 
 import (
-	_ "lecter/goserver/docs"
-	"lecter/goserver/internal/app/gochat"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	_ "lecter/goserver/docs"
+	"lecter/goserver/internal/app/gochat"
 )
 
 func Routing(r *gin.Engine) {

@@ -14,12 +14,12 @@ type ChannelLanguageService struct {
 	ChannelLanguageRepository repository.ChannelLanguageRepository
 }
 
-func NewChannelLanguageService (
+func NewChannelLanguageService(
 	channelRepository repository.ChannelRepository,
 	channelLanguageRepository repository.ChannelLanguageRepository,
-	) ChannelLanguageService {
+) ChannelLanguageService {
 	return ChannelLanguageService{
-		ChannelRepository: channelRepository,
+		ChannelRepository:         channelRepository,
 		ChannelLanguageRepository: channelLanguageRepository,
 	}
 }
