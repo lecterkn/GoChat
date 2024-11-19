@@ -14,13 +14,13 @@ import (
 
 type ChannelService struct {
 	ChannelRepository repository.ChannelRepository
-	RedisService RedisService
+	RedisService      RedisService
 }
 
 func NewChannelService(channelRepository repository.ChannelRepository, redisService RedisService) ChannelService {
 	return ChannelService{
 		ChannelRepository: channelRepository,
-		RedisService: redisService,
+		RedisService:      redisService,
 	}
 }
 
