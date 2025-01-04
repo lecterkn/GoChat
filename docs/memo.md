@@ -38,3 +38,21 @@ go get -u gorm.io/driver/postgres
 ```shell
 go get github.com/google/uuid
 ```
+
+## .env
+```shell
+go get github.com/joho/godotenv
+```
+
+## redis
+```shell
+go get github.com/redis/go-redis/v9
+```
+
+## Swagger
+```shell
+go get -u github.com/swaggo/swag/cmd/swag
+go get -u github.com/swaggo/gin-swagger
+go get -u github.com/swaggo/files
+go install github.com/swaggo/swag/cmd/swag@latest
+```
